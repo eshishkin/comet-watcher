@@ -1,0 +1,10 @@
+/bin
+target/
+
+# IDEA
+.idea
+*.iml
+
+# local Spring configuration files
+*-local.yaml
+*-local.properties
