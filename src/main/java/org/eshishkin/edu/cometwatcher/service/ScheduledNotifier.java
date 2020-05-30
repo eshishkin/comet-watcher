@@ -1,4 +1,4 @@
-package org.eshishkin.edu.cometwatcher;
+package org.eshishkin.edu.cometwatcher.service;
 
 import io.quarkus.mailer.MailTemplate;
 import io.quarkus.qute.api.ResourcePath;
@@ -10,11 +10,14 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.model.Comet;
-import org.eshishkin.edu.cometwatcher.service.CometService;
+import org.eshishkin.edu.cometwatcher.model.Subscription;
 
 @Slf4j
 @ApplicationScoped
 public class ScheduledNotifier {
+
+    @Inject
+    SubscriberService subscriberService;
 
     @Inject
     CometService cometService;
@@ -27,7 +30,12 @@ public class ScheduledNotifier {
 
     @Scheduled(cron = "{application.schedulers.comet-notifier}")
     public void send() {
-        send("eshishkin@mailinator.com", cometService.getComets());
+        List<Comet> comets = cometService.getComets();
+
+        subscriberService.getSubscriptions()
+                .stream()
+                .map(Subscription::getEmail)
+                .forEach(email -> send(email, comets));
     }
 
     private void send(String recipient, List<Comet> comets) {
