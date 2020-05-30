@@ -5,9 +5,7 @@ quarkus:
     level: INFO
   mailer:
     from: comet-watcher@example.com
-    host: localhost
-    port: 10025
-    mock: false
+    mock: true
 
 application:
   external:
@@ -19,3 +17,14 @@ application:
     templates:
       comet-report:
         subject: Test message from Quarkus App
+
+
+###############################################
+###### Properties for testing in docker #######
+###############################################
+"%docker":
+  quarkus:
+    mailer:
+      host: localhost
+      port: 10025
+      mock: false
