@@ -15,7 +15,7 @@ public class ScheduledNotifier {
     private final CometService cometService;
 
     @Scheduled(cron="{application.schedulers.comet-notifier}")
-    public void notify(ScheduledExecution execution) {
+    public void send() {
         log.info("Comets found {}", cometService.getComets().size());
     }
 }
