@@ -1,4 +1,4 @@
-package org.eshishkin.edu.cometwatcher;
+package org.eshishkin.edu.cometwatcher.config;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;

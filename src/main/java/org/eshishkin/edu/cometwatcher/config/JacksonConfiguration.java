@@ -1,4 +1,4 @@
-package org.eshishkin.edu.cometwatcher;
+package org.eshishkin.edu.cometwatcher.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
