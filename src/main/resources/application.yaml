@@ -4,5 +4,8 @@ quarkus:
 
 
 application:
+  external:
+    url:
+      heavens-above: https://www.heavens-above.com
   schedulers:
     comet-notifier: 0 0 0 */5 * ?
