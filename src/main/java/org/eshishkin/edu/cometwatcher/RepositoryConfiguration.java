@@ -1,6 +1,6 @@
 package org.eshishkin.edu.cometwatcher;
 
-import io.quarkus.arc.DefaultBean;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -16,12 +16,13 @@ public class RepositoryConfiguration {
     String heavensAboveBaseUrl;
 
     @Produces
-    @DefaultBean
+    @ApplicationScoped
     public CometExternalRepository cometExternalRepository(JsoupClient jsoupClient) {
         return new HeavensAboveCometRepository(heavensAboveBaseUrl, jsoupClient);
     }
 
     @Produces
+    @ApplicationScoped
     public JsoupClient jsoupClient() {
         return new JsoupClientImpl();
     }
