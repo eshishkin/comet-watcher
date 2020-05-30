@@ -8,12 +8,15 @@ import io.quarkus.scheduler.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.model.Comet;
+import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ApplicationScoped
@@ -36,7 +39,13 @@ public class ScheduledNotifier {
 
     @Scheduled(cron = "{application.schedulers.comet-notifier}")
     public void send() {
-        List<Subscription> subscriptions = subscriberService.getSubscriptions();
+        Instant now = Instant.now();
+
+        List<Subscription> subscriptions = subscriberService
+                .getSubscriptions()
+                .stream()
+                .filter(s -> now.isAfter(calculateNextTryDate(s)))
+                .collect(Collectors.toList());
 
         if (subscriptions.isEmpty()) {
             log.info("There is no active subscription");
@@ -45,11 +54,39 @@ public class ScheduledNotifier {
 
         List<Comet> comets = cometService.getComets();
 
-        String payload = render(comets);
+        send(render(comets), subscriptions);
+    }
 
+    private void send(String payload, List<Subscription> subscriptions) {
         subscriptions.stream().map(Subscription::getEmail).forEach(email -> {
             sender.send(Mail.withHtml(email, subject, payload));
+            subscriberService.updateLastTryDate(email);
         });
+    }
+
+    private Instant calculateNextTryDate(Subscription s) {
+        Instant lastTry = s.getLastSentOn();
+        ScheduleInterval interval = s.getInterval();
+
+        Instant next;
+        switch (interval) {
+            case DAILY:
+                next = lastTry.plus(1, ChronoUnit.DAYS);
+                break;
+            case WEEKLY:
+                next = lastTry.plus(1, ChronoUnit.WEEKS);
+                break;
+            case BIWEEKLY:
+                next = lastTry.plus(2, ChronoUnit.WEEKS);
+                break;
+            case MONTHLY:
+                next = lastTry.plus(1, ChronoUnit.MONTHS);
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported interval type: " + interval);
+        }
+
+        return next;
     }
 
     private String render(List<Comet> comets) {

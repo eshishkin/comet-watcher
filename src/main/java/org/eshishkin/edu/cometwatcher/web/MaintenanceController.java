@@ -1,23 +1,19 @@
 package org.eshishkin.edu.cometwatcher.web;
 
-import java.util.List;
-import javax.enterprise.context.ApplicationScoped;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.eshishkin.edu.cometwatcher.exception.InvalidDataException;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
+import org.eshishkin.edu.cometwatcher.model.SubscriptionRequest;
 import org.eshishkin.edu.cometwatcher.service.ScheduledNotifier;
 import org.eshishkin.edu.cometwatcher.service.SubscriberService;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 @ApplicationScoped
 @AllArgsConstructor
@@ -44,7 +40,7 @@ public class MaintenanceController {
 
     @POST
     @Path("/subscribers")
-    public Response subscribe(@Valid Subscription request) {
+    public Response subscribe(@Valid SubscriptionRequest request) {
         subscriberService.subscribe(request);
         return Response.status(Response.Status.CREATED).build();
     }

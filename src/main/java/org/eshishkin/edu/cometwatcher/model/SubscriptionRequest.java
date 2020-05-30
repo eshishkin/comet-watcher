@@ -2,16 +2,27 @@ package org.eshishkin.edu.cometwatcher.model;
 
 import lombok.Data;
 
-import java.time.Instant;
-import java.time.ZoneId;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
-public class Subscription {
+public class SubscriptionRequest {
+
+    @Email
+    @NotEmpty
     private String email;
+
+    @NotNull
     private String observerLatitude;
+
+    @NotNull
     private String observerLongitude;
+
+    @NotNull
     private String observerAltitude;
-    private ZoneId observerTimeZone;
+
+    @NotNull
     private ScheduleInterval interval;
-    private Instant lastSentOn;
+
 }
