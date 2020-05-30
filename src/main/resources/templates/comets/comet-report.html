@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Periodical report about upcoming comets</title>
+    </head>
+    <body>
+        <h2>Periodical report about upcoming comets</h2>
+        Dear user,
+
+        <p>A list of upcoming comets is generated</p>
+
+        <ul>
+            {#for comet in comets}
+                <li style="margin: 5px 0px 5px 0px;"><span style="text-decoration: underline;"><b>{comet.name}</b> ({comet.constellation})</span> - mag: <b>{comet.brightness}</b>, altitude: {comet.altitude}, azimuth: {comet.azimuth}</li>
+            {/for}
+        </ul>
+
+        <br>
+        <p><b>Report generated at: {generated_at}</b></p>
+
+        <p>
+            Sincerely,<br>
+            CometWatcherApp Team
+        </p>
+    </body>
+</html>

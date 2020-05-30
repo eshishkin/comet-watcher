@@ -1,7 +1,13 @@
 quarkus:
   banner:
     path: banner.txt
-
+  log:
+    level: INFO
+  mailer:
+    from: comet-watcher@example.com
+    host: localhost
+    port: 10025
+    mock: false
 
 application:
   external:
@@ -9,3 +15,7 @@ application:
       heavens-above: https://www.heavens-above.com
   schedulers:
     comet-notifier: 0 0 0 */5 * ?
+  mail:
+    templates:
+      comet-report:
+        subject: Test message from Quarkus App
