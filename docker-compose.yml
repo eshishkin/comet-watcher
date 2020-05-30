@@ -1,0 +1,17 @@
+version: "2"
+
+services:
+  smtp:
+    image: namshi/smtp:latest
+    mem_limit: 32m
+    expose:
+      - "25"
+    ports:
+      - "10025:25"
+    networks:
+      backend:
+        aliases:
+          - smtp.comet-watcher.com
+
+networks:
+  backend:
