@@ -36,7 +36,7 @@ public class HeavensAboveCometRepositoryTest {
 
     @Test
     public void testGetComet_Success() {
-        doReturn(load("HeavensAboveCometRepositoryTest_CometList.html")).when(jsoup).get(BASE_URL + "/Comets.aspx");
+        doReturn(load("HeavensAboveCometRepositoryTest_CometList.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?alt=0");
 
         List<Comet> comets = repository.getComets();
 
@@ -69,14 +69,14 @@ public class HeavensAboveCometRepositoryTest {
 
     @Test
     public void testGetComet_EmptyTableWithComets() {
-        doReturn(load("HeavensAboveCometRepositoryTest_EmptyTableWithComets.html")).when(jsoup).get(BASE_URL + "/Comets.aspx");
+        doReturn(load("HeavensAboveCometRepositoryTest_EmptyTableWithComets.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?alt=0");
 
         assertEquals(0, repository.getComets().size());
     }
 
     @Test
     public void testGetComet_EmptyCometName() {
-        doReturn(load("HeavensAboveCometRepositoryTest_EmptyCometName.html")).when(jsoup).get(BASE_URL + "/Comets.aspx");
+        doReturn(load("HeavensAboveCometRepositoryTest_EmptyCometName.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?alt=0");
 
         assertEquals(0, repository.getComets().size());
     }
