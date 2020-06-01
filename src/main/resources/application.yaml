@@ -28,3 +28,8 @@ application:
       host: localhost
       port: 10025
       mock: false
+  repository:
+    subscribers:
+      url: http://localhost:5984
+      user: admin
+      password: password

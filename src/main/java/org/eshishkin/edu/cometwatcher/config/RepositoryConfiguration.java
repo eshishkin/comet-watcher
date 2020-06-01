@@ -26,4 +26,6 @@ public class RepositoryConfiguration {
     public JsoupClient jsoupClient() {
         return new JsoupClientImpl();
     }
+
+
 }
