@@ -12,6 +12,20 @@ services:
       backend:
         aliases:
           - smtp.comet-watcher.com
+  db:
+    image: couchdb:latest
+    mem_limit: 128m
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=password
+    expose:
+      - "5984"
+    ports:
+      - "5984:5984"
+    networks:
+      backend:
+        aliases:
+          - repository.comet-watcher.com
 
 networks:
   backend:
