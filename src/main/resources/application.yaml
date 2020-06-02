@@ -5,7 +5,6 @@ quarkus:
     level: INFO
   mailer:
     from: comet-watcher@example.com
-    mock: true
 
 application:
   external:
@@ -18,18 +17,32 @@ application:
       comet-report:
         subject: Test message from Quarkus App
 
+###############################################
+####### Properties for testing locally ########
+###############################################
+"%local":
+  quarkus:
+    mailer:
+      mock: true
+  application:
+    datasource:
+      subscribers:
+        url: http://localhost:5984
+        user: admin
+        password: password
 
 ###############################################
 ###### Properties for testing in docker #######
 ###############################################
-"%docker":
+"%local-docker":
   quarkus:
     mailer:
       host: localhost
       port: 10025
       mock: false
-  repository:
-    subscribers:
-      url: http://localhost:5984
-      user: admin
-      password: password
+  application:
+    datasource:
+      subscribers:
+        url: http://localhost:5984
+        user: admin
+        password: password
