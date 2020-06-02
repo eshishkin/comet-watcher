@@ -1,9 +1,11 @@
 package org.eshishkin.edu.cometwatcher.repository;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eshishkin.edu.cometwatcher.external.JsoupClient;
 import org.eshishkin.edu.cometwatcher.model.Comet;
+import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -19,6 +21,7 @@ import java.util.regex.Pattern;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+@Slf4j
 public class HeavensAboveCometRepository implements CometExternalRepository {
     private static final String ENDPOINT_COMETS = "/Comets.aspx";
 
@@ -32,11 +35,11 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
 
     @Override
     public List<Comet> getComets() {
-        return getComets(new ObserverData());
+        return getComets(GeoRequest.asNullIsland());
     }
 
     @Override
-    public List<Comet> getComets(ObserverData observer) {
+    public List<Comet> getComets(GeoRequest observer) {
         return getListOfComets(observer)
                 .stream()
                 .filter(row -> StringUtils.isNotBlank(row.getName()))
@@ -55,9 +58,10 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
 
     }
 
-    private Map<String, String> toParams(ObserverData observer) {
+    private Map<String, String> toParams(GeoRequest observer) {
         Map<String, String> params = new HashMap<>();
         params.put("alt", String.valueOf(observer.getAltitude()));
+        params.put("tz", "GMT");
 
         if (observer.getLatitude() != null) {
             params.put("lat", observer.getLatitude());
@@ -69,7 +73,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
         return params;
     }
 
-    private List<CometRow> getListOfComets(ObserverData observer) {
+    private List<CometRow> getListOfComets(GeoRequest observer) {
         String url = new StringBuilder(baseUrl + ENDPOINT_COMETS)
                 .append("?")
                 .append(toParams(observer)
@@ -80,6 +84,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
                 )
                 .toString();
 
+        log.info("Requesting {}", url);
         Elements rows = jsoup.get(url).select("table.standardTable > tbody > tr");
         return rows.stream().map(CometRow::new).collect(toList());
     }

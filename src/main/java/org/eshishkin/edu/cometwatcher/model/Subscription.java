@@ -10,7 +10,7 @@ public class Subscription {
     private String email;
     private String observerLatitude;
     private String observerLongitude;
-    private String observerAltitude;
+    private int observerAltitude;
     private ZoneId observerTimeZone;
     private ScheduleInterval interval;
     private Instant lastSentOn;

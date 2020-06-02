@@ -8,6 +8,7 @@ import io.quarkus.scheduler.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.model.Comet;
+import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
@@ -16,7 +17,9 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Slf4j
 @ApplicationScoped
@@ -41,20 +44,25 @@ public class ScheduledNotifier {
     public void send() {
         Instant now = Instant.now();
 
-        List<Subscription> subscriptions = subscriberService
+        Map<GeoRequest, List<Subscription>> subscriptions = subscriberService
                 .getSubscriptions()
                 .stream()
                 .filter(s -> now.isAfter(calculateNextTryDate(s)))
-                .collect(Collectors.toList());
+                .collect(groupingBy(
+                    s -> GeoRequest.of(s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude())
+                ));
 
         if (subscriptions.isEmpty()) {
             log.info("There is no active subscription");
             return;
         }
 
-        List<Comet> comets = cometService.getComets();
+        subscriptions.entrySet().stream().forEach(e -> {
+            GeoRequest geo = e.getKey();
+            List<Subscription> subscribers = e.getValue();
 
-        send(render(comets), subscriptions);
+            send(render(cometService.getComets(geo)), subscribers);
+        });
     }
 
     private void send(String payload, List<Subscription> subscriptions) {
