@@ -1,13 +1,7 @@
 package org.eshishkin.edu.cometwatcher.repository;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.List;
-import org.eshishkin.edu.cometwatcher.model.Comet;
 import org.eshishkin.edu.cometwatcher.external.JsoupClient;
+import org.eshishkin.edu.cometwatcher.model.Comet;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
@@ -36,7 +38,7 @@ public class HeavensAboveCometRepositoryTest {
 
     @Test
     public void testGetComet_Success() {
-        doReturn(load("HeavensAboveCometRepositoryTest_CometList.html")).when(jsoup).get(BASE_URL + "/Comets.aspx");
+        doReturn(load("HeavensAboveCometRepositoryTest_CometList.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?lng=0&tz=GMT&alt=0&lat=0");
 
         List<Comet> comets = repository.getComets();
 
@@ -69,14 +71,14 @@ public class HeavensAboveCometRepositoryTest {
 
     @Test
     public void testGetComet_EmptyTableWithComets() {
-        doReturn(load("HeavensAboveCometRepositoryTest_EmptyTableWithComets.html")).when(jsoup).get(BASE_URL + "/Comets.aspx");
+        doReturn(load("HeavensAboveCometRepositoryTest_EmptyTableWithComets.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?lng=0&tz=GMT&alt=0&lat=0");
 
         assertEquals(0, repository.getComets().size());
     }
 
     @Test
     public void testGetComet_EmptyCometName() {
-        doReturn(load("HeavensAboveCometRepositoryTest_EmptyCometName.html")).when(jsoup).get(BASE_URL + "/Comets.aspx");
+        doReturn(load("HeavensAboveCometRepositoryTest_EmptyCometName.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?lng=0&tz=GMT&alt=0&lat=0");
 
         assertEquals(0, repository.getComets().size());
     }
