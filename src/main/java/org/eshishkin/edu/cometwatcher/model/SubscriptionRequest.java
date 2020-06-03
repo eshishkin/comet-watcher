@@ -2,9 +2,7 @@ package org.eshishkin.edu.cometwatcher.model;
 
 import lombok.Data;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 @Data
 public class SubscriptionRequest {
@@ -19,8 +17,9 @@ public class SubscriptionRequest {
     @NotNull
     private String observerLongitude;
 
-    @NotNull
-    private String observerAltitude;
+    @Max(90)
+    @Min(-90)
+    private int observerAltitude;
 
     @NotNull
     private ScheduleInterval interval;

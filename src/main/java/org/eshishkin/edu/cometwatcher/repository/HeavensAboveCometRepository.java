@@ -1,19 +1,27 @@
 package org.eshishkin.edu.cometwatcher.repository;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eshishkin.edu.cometwatcher.external.JsoupClient;
 import org.eshishkin.edu.cometwatcher.model.Comet;
+import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+@Slf4j
 public class HeavensAboveCometRepository implements CometExternalRepository {
     private static final String ENDPOINT_COMETS = "/Comets.aspx";
 
@@ -25,8 +33,14 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
         this.jsoup = jsoup;
     }
 
+    @Override
     public List<Comet> getComets() {
-        return getListOfComets()
+        return getComets(GeoRequest.asNullIsland());
+    }
+
+    @Override
+    public List<Comet> getComets(GeoRequest observer) {
+        return getListOfComets(observer)
                 .stream()
                 .filter(row -> StringUtils.isNotBlank(row.getName()))
                 .map(row -> {
@@ -44,8 +58,33 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
 
     }
 
-    private List<CometRow> getListOfComets() {
-        String url = baseUrl + ENDPOINT_COMETS;
+    private Map<String, String> toParams(GeoRequest observer) {
+        Map<String, String> params = new HashMap<>();
+        params.put("alt", String.valueOf(observer.getAltitude()));
+        params.put("tz", "GMT");
+
+        if (observer.getLatitude() != null) {
+            params.put("lat", observer.getLatitude());
+        }
+
+        if (observer.getLongitude() != null) {
+            params.put("lng", observer.getLongitude());
+        }
+        return params;
+    }
+
+    private List<CometRow> getListOfComets(GeoRequest observer) {
+        String url = new StringBuilder(baseUrl + ENDPOINT_COMETS)
+                .append("?")
+                .append(toParams(observer)
+                        .entrySet()
+                        .stream()
+                        .map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+                        .collect(joining("&"))
+                )
+                .toString();
+
+        log.info("Requesting {}", url);
         Elements rows = jsoup.get(url).select("table.standardTable > tbody > tr");
         return rows.stream().map(CometRow::new).collect(toList());
     }
