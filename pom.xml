@@ -48,6 +48,12 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-config-yaml</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.slf4j</groupId>
+                    <artifactId>slf4j-jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
