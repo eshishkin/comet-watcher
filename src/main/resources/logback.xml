@@ -1,6 +1,12 @@
-<configuration debug="true">
+<configuration>
 
-    <property name="PATTERN" value="%d{yyyy.MM.dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+    <jmxConfigurator />
+
+    <property resource="application.properties" />
+
+    <property name="PATTERN" value="${application.logging.pattern}" />
+    <property name="FILE_PATH" value="${application.logging.file.path:-/tmp}"/>
+    <property name="FILE_NAME" value="${application.logging.file.name}"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -9,9 +15,9 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>comet-watcher.log</file>
+        <file>${FILE_PATH}/${FILE_NAME}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>comet-watcher.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${FILE_PATH}/${FILE_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>10</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
