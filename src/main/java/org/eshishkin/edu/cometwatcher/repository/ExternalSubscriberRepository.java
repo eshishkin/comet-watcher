@@ -3,10 +3,13 @@ package org.eshishkin.edu.cometwatcher.repository;
 import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
+
+import io.quarkus.arc.profile.UnlessBuildProfile;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
 @ApplicationScoped
+@UnlessBuildProfile("local")
 public class ExternalSubscriberRepository implements SubscriberRepository {
 
     @ConfigProperty(name = "{application.datasource.subscribers.url}")
