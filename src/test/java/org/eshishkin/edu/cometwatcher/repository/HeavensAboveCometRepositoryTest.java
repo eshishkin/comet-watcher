@@ -1,9 +1,7 @@
 package org.eshishkin.edu.cometwatcher.repository;
 
-import org.eshishkin.edu.cometwatcher.external.JsoupClient;
+import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.model.Comet;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,22 +21,22 @@ import static org.mockito.Mockito.doReturn;
 @ExtendWith(MockitoExtension.class)
 public class HeavensAboveCometRepositoryTest {
 
-    private static final String BASE_URL = "http://example.com";
-    public static final double DELTA = 0.1;
+    private static final double DELTA = 0.1;
 
     @Mock
-    private JsoupClient jsoup;
+    private HeavensAboveExternalService heavensAboveExternalService;
 
     private CometExternalRepository repository;
 
     @BeforeEach
     public void before() {
-        repository = new HeavensAboveCometRepository(BASE_URL, jsoup);
+        repository = new HeavensAboveCometRepository(heavensAboveExternalService);
     }
 
     @Test
     public void testGetComet_Success() {
-        doReturn(load("HeavensAboveCometRepositoryTest_CometList.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?lng=0&tz=GMT&alt=0&lat=0");
+        doReturn(load("HeavensAboveCometRepositoryTest_CometList.html"))
+                .when(heavensAboveExternalService).getComets("0", "0", 0, "GMT");
 
         List<Comet> comets = repository.getComets();
 
@@ -71,23 +69,24 @@ public class HeavensAboveCometRepositoryTest {
 
     @Test
     public void testGetComet_EmptyTableWithComets() {
-        doReturn(load("HeavensAboveCometRepositoryTest_EmptyTableWithComets.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?lng=0&tz=GMT&alt=0&lat=0");
+        doReturn(load("HeavensAboveCometRepositoryTest_EmptyTableWithComets.html"))
+                .when(heavensAboveExternalService).getComets("0", "0", 0, "GMT");
 
         assertEquals(0, repository.getComets().size());
     }
 
     @Test
     public void testGetComet_EmptyCometName() {
-        doReturn(load("HeavensAboveCometRepositoryTest_EmptyCometName.html")).when(jsoup).get(BASE_URL + "/Comets.aspx?lng=0&tz=GMT&alt=0&lat=0");
+        doReturn(load("HeavensAboveCometRepositoryTest_EmptyCometName.html"))
+                .when(heavensAboveExternalService).getComets("0", "0", 0, "GMT");
 
         assertEquals(0, repository.getComets().size());
     }
 
-    private Document load(String name) {
-        try (InputStream resource = HeavensAboveCometRepositoryTest.class.getResourceAsStream(name)) {
-            String data = new String(resource.readAllBytes(), StandardCharsets.UTF_8);
 
-            return Jsoup.parse(data);
+    private String load(String name) {
+        try (InputStream resource = HeavensAboveCometRepositoryTest.class.getResourceAsStream(name)) {
+            return new String(resource.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException("Unable to load or parse document " + name, e);
         }
