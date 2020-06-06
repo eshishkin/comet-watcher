@@ -24,10 +24,10 @@ public class SubscriberService {
     }
 
     public void updateLastTryDate(String email) {
-        Subscription subscription = subscriberRepository.get(email);
-        if (subscription != null) {
+        subscriberRepository.get(email).ifPresent(subscription -> {
             subscription.setLastSentOn(Instant.now());
-        }
+            subscriberRepository.update(subscription);
+        });
     }
 
     public void unsubscribe(String email) {

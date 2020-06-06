@@ -1,15 +1,18 @@
 package org.eshishkin.edu.cometwatcher.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
 public interface SubscriberRepository {
 
     List<Subscription> findAll();
 
-    Subscription get(String email);
+    Optional<Subscription> get(String id);
 
     void create(Subscription subscription);
 
-    void delete(String email);
+    void update(Subscription subscription);
+
+    void delete(String id);
 }

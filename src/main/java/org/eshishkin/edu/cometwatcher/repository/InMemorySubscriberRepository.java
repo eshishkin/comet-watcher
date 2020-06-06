@@ -4,6 +4,7 @@ import io.quarkus.arc.profile.IfBuildProfile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.enterprise.context.ApplicationScoped;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
@@ -20,8 +21,8 @@ public class InMemorySubscriberRepository implements SubscriberRepository {
     }
 
     @Override
-    public Subscription get(String email) {
-        return subscriptions.get(email);
+    public Optional<Subscription> get(String id) {
+        return Optional.ofNullable(subscriptions.get(id));
     }
 
     @Override
@@ -30,7 +31,12 @@ public class InMemorySubscriberRepository implements SubscriberRepository {
     }
 
     @Override
-    public void delete(String email) {
-        subscriptions.remove(email);
+    public void update(Subscription subscription) {
+        subscriptions.put(subscription.getEmail(), subscription);
+    }
+
+    @Override
+    public void delete(String id) {
+        subscriptions.remove(id);
     }
 }
