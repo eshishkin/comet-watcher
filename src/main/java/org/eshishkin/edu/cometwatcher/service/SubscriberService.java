@@ -1,38 +1,37 @@
 package org.eshishkin.edu.cometwatcher.service;
 
-import org.eshishkin.edu.cometwatcher.model.Subscription;
-import org.eshishkin.edu.cometwatcher.model.SubscriptionRequest;
-
-import javax.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.enterprise.context.ApplicationScoped;
+import lombok.AllArgsConstructor;
+import org.eshishkin.edu.cometwatcher.model.Subscription;
+import org.eshishkin.edu.cometwatcher.model.SubscriptionRequest;
+import org.eshishkin.edu.cometwatcher.repository.SubscriberRepository;
 
 @ApplicationScoped
+@AllArgsConstructor
 public class SubscriberService {
 
-    private final Map<String, Subscription> subscriptions = new ConcurrentHashMap<>();
+    private final SubscriberRepository subscriberRepository;
 
     public List<Subscription> getSubscriptions() {
-        return new ArrayList<>(subscriptions.values());
+        return subscriberRepository.findAll();
     }
 
     public void subscribe(SubscriptionRequest request) {
-        subscriptions.put(request.getEmail(), toSubscription(request));
+        subscriberRepository.create(toSubscription(request));
     }
 
     public void updateLastTryDate(String email) {
-        Subscription subscription = subscriptions.get(email);
-        if (subscription != null) {
+        subscriberRepository.get(email).ifPresent(subscription -> {
             subscription.setLastSentOn(Instant.now());
-        }
+            subscriberRepository.update(subscription);
+        });
     }
 
     public void unsubscribe(String email) {
-        subscriptions.remove(email);
+        subscriberRepository.delete(email);
     }
 
     private Subscription toSubscription(SubscriptionRequest request) {
