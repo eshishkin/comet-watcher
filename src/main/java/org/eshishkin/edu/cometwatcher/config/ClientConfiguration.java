@@ -9,11 +9,14 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.core.HttpHeaders;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.external.subscription.ExternalSubscriberClient;
+import org.eshishkin.edu.cometwatcher.utils.LoggingInterceptor;
+import org.slf4j.LoggerFactory;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -31,6 +34,7 @@ public class ClientConfiguration {
 
         return getDefaultBuilder()
                 .baseUrl(toURL(url))
+                .register(new LoggingInterceptor(LoggerFactory.getLogger(HeavensAboveExternalService.class)))
                 .build(HeavensAboveExternalService.class);
     }
 
@@ -44,9 +48,10 @@ public class ClientConfiguration {
         return getDefaultBuilder()
                 .baseUrl(toURL(url))
                 .register((ClientRequestFilter) context -> context.getHeaders().add(
-                        "Authorization",
+                        HttpHeaders.AUTHORIZATION,
                         "Basic " + Base64.getEncoder().encodeToString(format("%s:%s", user, password).getBytes(UTF_8))
                 ))
+                .register(new LoggingInterceptor(LoggerFactory.getLogger(ExternalSubscriberClient.class)))
                 .build(ExternalSubscriberClient.class);
     }
 

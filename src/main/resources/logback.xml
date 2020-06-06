@@ -32,4 +32,7 @@
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
     </root>
+
+    <logger name="org.eshishkin.edu.cometwatcher.external" level="DEBUG"/>
+
 </configuration>
