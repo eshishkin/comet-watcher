@@ -1,12 +1,14 @@
 package org.eshishkin.edu.cometwatcher.config;
 
+import javax.inject.Singleton;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import io.quarkus.jackson.ObjectMapperCustomizer;
-import javax.inject.Singleton;
 
 @Singleton
 public class JacksonConfiguration implements ObjectMapperCustomizer {

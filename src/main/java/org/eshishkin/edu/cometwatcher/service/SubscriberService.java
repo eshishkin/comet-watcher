@@ -3,11 +3,14 @@ package org.eshishkin.edu.cometwatcher.service;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
-import lombok.AllArgsConstructor;
+
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 import org.eshishkin.edu.cometwatcher.model.SubscriptionRequest;
 import org.eshishkin.edu.cometwatcher.repository.SubscriberRepository;
+
+import lombok.AllArgsConstructor;
 
 @ApplicationScoped
 @AllArgsConstructor

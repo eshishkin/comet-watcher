@@ -1,18 +1,22 @@
 package org.eshishkin.edu.cometwatcher.repository;
 
-import io.quarkus.arc.profile.UnlessBuildProfile;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import lombok.AllArgsConstructor;
+
 import org.eshishkin.edu.cometwatcher.external.subscription.ExternalSubscriberClient;
 import org.eshishkin.edu.cometwatcher.external.subscription.model.SearchRequest;
 import org.eshishkin.edu.cometwatcher.external.subscription.model.SubscriberSelector;
 import org.eshishkin.edu.cometwatcher.external.subscription.model.SubscriptionRecord;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
+
+import io.quarkus.arc.profile.UnlessBuildProfile;
+import lombok.AllArgsConstructor;
+
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @ApplicationScoped
@@ -57,7 +61,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
         try {
             return Optional.of(client.get(id));
         } catch (WebApplicationException ex) {
-            try(Response response = ex.getResponse()) {
+            try (Response response = ex.getResponse()) {
                 if (response.getStatus() == NOT_FOUND.getStatusCode()) {
                     return Optional.empty();
                 } else {
@@ -66,6 +70,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
             }
         }
     }
+
     private Subscription toBusinessModel(SubscriptionRecord external) {
         Subscription subscription = new Subscription();
         subscription.setEmail(external.getEmail());

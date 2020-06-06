@@ -21,7 +21,36 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <quarkus.version>1.5.0.Final</quarkus.version>
         <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
+        <maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
+        <spotbugs-maven-plugin.version>4.0.0</spotbugs-maven-plugin.version>
+
+        <check.checkstyle.skip>false</check.checkstyle.skip>
+        <check.spotbugs.skip>false</check.spotbugs.skip>
+        <check.jacoco.skip>false</check.jacoco.skip>
+        <check.test.skip>false</check.test.skip>
+
+        <skipTests>${check.test.skip}</skipTests>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>no-checks</id>
+            <properties>
+                <check.checkstyle.skip>true</check.checkstyle.skip>
+                <check.spotbugs.skip>true</check.spotbugs.skip>
+                <check.jacoco.skip>true</check.jacoco.skip>
+                <check.test.skip>true</check.test.skip>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>tests-only</id>
+            <properties>
+                <check.checkstyle.skip>true</check.checkstyle.skip>
+                <check.spotbugs.skip>true</check.spotbugs.skip>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -182,13 +211,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>${maven-checkstyle-plugin.version}</version>
                 <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
+                    <skip>${check.checkstyle.skip}</skip>
+                    <configLocation>${basedir}/etc/checkstyle/checkstyle.xml</configLocation>
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
@@ -203,6 +233,23 @@
                 </dependencies>
             </plugin>
 
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs-maven-plugin.version}</version>
+                <configuration>
+                    <skip>${check.spotbugs.skip}</skip>
+                    <excludeFilterFile>${basedir}/etc/spotbugs/spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

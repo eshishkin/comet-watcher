@@ -1,7 +1,14 @@
 package org.eshishkin.edu.cometwatcher.repository;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.enterprise.context.ApplicationScoped;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.model.Comet;
@@ -10,13 +17,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.enterprise.context.ApplicationScoped;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import static java.util.stream.Collectors.toList;
 
@@ -51,6 +53,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
                 .collect(toList());
 
     }
+
     private List<CometRow> getListOfComets(GeoRequest observer) {
         String html = heavensAboveExternalService.getComets(
                 observer.getLatitude(), observer.getLongitude(),
@@ -77,11 +80,13 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
             return Float.parseFloat(row.child(1).text());
         }
 
+        @SuppressWarnings("MagicNumber")
         public LocalDate getObserved() {
             String date = row.child(2).text();
             return LocalDate.parse(date, FORMATTER);
         }
 
+        @SuppressWarnings("MagicNumber")
         public Float getAltitude() {
             String azimuth = row.child(4).text();
             Matcher matcher = PATTERN_ALTITUDE.matcher(azimuth);
@@ -89,6 +94,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
             return matcher.matches() ? Float.parseFloat(matcher.group(1)) : null;
         }
 
+        @SuppressWarnings("MagicNumber")
         public Long getAzimuthDegrees() {
             String azimuth = row.child(5).text();
             Matcher matcher = PATTERN_AZIMUTH.matcher(azimuth);
@@ -96,6 +102,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
             return matcher.matches() ? Long.valueOf(matcher.group(1)) : null;
         }
 
+        @SuppressWarnings("MagicNumber")
         public String getAzimuthDirection() {
             String azimuth = row.child(5).text();
             Matcher matcher = PATTERN_AZIMUTH.matcher(azimuth);
@@ -103,6 +110,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
             return matcher.matches() ? matcher.group(2) : null;
         }
 
+        @SuppressWarnings("MagicNumber")
         public String getConstellation() {
             return row.child(6).text();
         }

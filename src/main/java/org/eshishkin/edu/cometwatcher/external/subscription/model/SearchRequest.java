@@ -1,6 +1,7 @@
 package org.eshishkin.edu.cometwatcher.external.subscription.model;
 
 import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 

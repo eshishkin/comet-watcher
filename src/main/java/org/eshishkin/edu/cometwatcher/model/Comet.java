@@ -1,8 +1,10 @@
 package org.eshishkin.edu.cometwatcher.model;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import java.time.LocalDate;
+
 import lombok.Data;
 
 @Data

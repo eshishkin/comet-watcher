@@ -4,19 +4,25 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.ws.rs.client.ClientRequestFilter;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.external.subscription.ExternalSubscriberClient;
+
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Dependent
 public class ClientConfiguration {
+
+    private static final int DEFAULT_CONNECTION_TIMEOUT = 30;
+    private static final int DEFAULT_READ_TIMEOUT = 2;
 
     @Produces
     @ApplicationScoped
@@ -54,7 +60,7 @@ public class ClientConfiguration {
 
     private RestClientBuilder getDefaultBuilder() {
         return RestClientBuilder.newBuilder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(2, TimeUnit.MINUTES);
+                .connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.MINUTES);
     }
 }
