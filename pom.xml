@@ -164,6 +164,8 @@
     </dependencies>
 
     <build>
+        <finalName>comet-watcher</finalName>
+
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
