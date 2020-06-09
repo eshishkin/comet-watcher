@@ -50,6 +50,13 @@
                 <check.spotbugs.skip>true</check.spotbugs.skip>
             </properties>
         </profile>
+
+        <profile>
+            <id>uber-jar</id>
+            <properties>
+                <quarkus.package.uber-jar>true</quarkus.package.uber-jar>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencyManagement>
