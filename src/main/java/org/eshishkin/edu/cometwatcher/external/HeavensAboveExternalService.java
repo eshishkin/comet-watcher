@@ -14,4 +14,12 @@ public interface HeavensAboveExternalService {
     String getComets(@QueryParam("lat") String latitude, @QueryParam("lng") String longitude,
                      @QueryParam("alt") int altitude, @QueryParam("tz") String timezone
     );
+
+    @GET
+    @Path("/comet.aspx")
+    @Produces("text/html")
+    String getComet(@QueryParam("cid") String name,
+                    @QueryParam("lat") String latitude, @QueryParam("lng") String longitude,
+                    @QueryParam("alt") int altitude, @QueryParam("tz") String timezone
+    );
 }

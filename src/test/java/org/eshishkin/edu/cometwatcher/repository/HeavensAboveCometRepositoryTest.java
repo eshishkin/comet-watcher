@@ -34,9 +34,18 @@ public class HeavensAboveCometRepositoryTest {
     }
 
     @Test
-    public void testGetComet_Success() {
+    public void testGetComets_Success() {
         doReturn(load("HeavensAboveCometRepositoryTest_CometList.html"))
                 .when(heavensAboveExternalService).getComets("0", "0", 0, "GMT");
+
+        doReturn(load("HeavensAboveCometRepositoryTest_CometPage.html"))
+                .when(heavensAboveExternalService).getComet("C/2019 U6", "0", "0", 0, "GMT");
+
+        doReturn(load("HeavensAboveCometRepositoryTest_CometPage.html"))
+                .when(heavensAboveExternalService).getComet("C/2020 F3", "0", "0", 0, "GMT");
+
+        doReturn(load("HeavensAboveCometRepositoryTest_CometPage.html"))
+                .when(heavensAboveExternalService).getComet("C/2020 F8", "0", "0", 0, "GMT");
 
         List<Comet> comets = repository.getComets();
 
@@ -49,6 +58,16 @@ public class HeavensAboveCometRepositoryTest {
         assertEquals(124, comets.get(0).getAzimuth());
         assertEquals("ESE", comets.get(0).getDirection());
         assertEquals("Canis Major", comets.get(0).getConstellation());
+
+        assertEquals("7h 54.6m", comets.get(0).getRigthAccession());
+        assertEquals("-16° 37'", comets.get(0).getDeclination());
+        assertEquals("0.958 AU", comets.get(0).getDistanceFromEarth());
+        assertEquals("860.766 AU", comets.get(0).getAphelion());
+        assertEquals("0.914 AU (2020-Jun-18)", comets.get(0).getPerihelion());
+        assertEquals("0.929 AU", comets.get(0).getDistanceFromSun());
+        assertEquals("0.997878", comets.get(0).getEccentricity());
+        assertEquals("8,943 years", comets.get(0).getPeriod());
+
 
         assertEquals("C/2020 F3 NEOWISE", comets.get(1).getName());
         assertEquals(7.7, comets.get(1).getBrightness(), DELTA);
@@ -68,7 +87,7 @@ public class HeavensAboveCometRepositoryTest {
     }
 
     @Test
-    public void testGetComet_EmptyTableWithComets() {
+    public void testGetComets_EmptyTableWithComets() {
         doReturn(load("HeavensAboveCometRepositoryTest_EmptyTableWithComets.html"))
                 .when(heavensAboveExternalService).getComets("0", "0", 0, "GMT");
 
@@ -76,7 +95,7 @@ public class HeavensAboveCometRepositoryTest {
     }
 
     @Test
-    public void testGetComet_EmptyCometName() {
+    public void testGetComets_EmptyCometName() {
         doReturn(load("HeavensAboveCometRepositoryTest_EmptyCometName.html"))
                 .when(heavensAboveExternalService).getComets("0", "0", 0, "GMT");
 
