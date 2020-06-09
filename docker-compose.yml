@@ -6,8 +6,6 @@ services:
     mem_limit: 32m
     expose:
       - "25"
-    ports:
-      - "10025:25"
     networks:
       backend:
         aliases:
@@ -20,12 +18,22 @@ services:
       - COUCHDB_PASSWORD=password
     expose:
       - "5984"
-    ports:
-      - "5984:5984"
     networks:
       backend:
         aliases:
           - database.comet-watcher.com
+  app:
+    image: eshishkin/comet-watcher:latest
+    mem_limit: 128m
+    expose:
+      - "8080"
+    ports:
+      - "18080:8080"
+    depends_on:
+      - smtp
+      - db
+    networks:
+      backend:
 
 networks:
   backend:

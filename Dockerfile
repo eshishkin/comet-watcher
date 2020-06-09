@@ -5,8 +5,9 @@ WORKDIR project
 
 COPY pom.xml pom.xml
 COPY src src
+COPY etc etc
 
-RUN --mount=type=cache,target=/root/.m2 mvn -Dquarkus.profile=local -Dquarkus.package.uber-jar=true clean package
+RUN --mount=type=cache,target=/root/.m2 mvn -Dquarkus.profile=local -Puber-jar clean package
 
 
 FROM adoptopenjdk:14-jre-hotspot
