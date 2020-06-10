@@ -18,6 +18,8 @@ services:
       - COUCHDB_PASSWORD=password
     expose:
       - "5984"
+    volumes:
+      - comet-watcher-db:/var/lib/couchdb
     networks:
       backend:
         aliases:
@@ -37,3 +39,6 @@ services:
 
 networks:
   backend:
+
+volumes:
+  comet-watcher-db:

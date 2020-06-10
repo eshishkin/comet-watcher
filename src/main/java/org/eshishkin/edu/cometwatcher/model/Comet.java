@@ -24,4 +24,21 @@ public class Comet {
     private String direction;
 
     private String constellation;
+
+    private String distanceFromSun;
+
+    private String distanceFromEarth;
+
+    private String perihelion;
+
+    private String aphelion;
+
+    private String period;
+
+    private String eccentricity;
+
+    private String rigthAccession;
+
+    private String declination;
+
 }
