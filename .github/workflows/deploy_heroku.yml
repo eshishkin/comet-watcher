@@ -6,7 +6,7 @@ name: Deploy to Heroku
 # events but only for the master branch
 on:
   release:
-    types: [prereleased, created, published]
+    types: [prereleased]
 
 jobs:
   build:
@@ -20,12 +20,12 @@ jobs:
 
     - name: Build docker image
       run: DOCKER_BUILDKIT=1 docker build -t eshishkin/comet-watcher:${{steps.vars.outputs.tag}} .
-    
-    - name: Login in Heroku
-      run: docker login --username={{ secrets.HEROKU_USER_NAME }} --password={{ secrets.HEROKU_API_KEY }} registry.heroku.com
-    
-    - name: Tag image with Heroku specific format
-      run: docker tag eshishkin/comet-watcher:${{steps.vars.outputs.tag}} registry.heroku.com/comet-watcher/release
 
-    - name: Deploy to Heroku
-      run: docker push registry.heroku.com/comet-watcher/release
+    - name: Login in Heroku
+      run: echo ${{ secrets.HEROKU_API_KEY }} | docker login registry.heroku.com -u ${{ secrets.HEROKU_USER_NAME }} --password-stdin
+
+    - name: Tag image with Heroku specific format
+      run: docker tag eshishkin/comet-watcher:${{steps.vars.outputs.tag}} registry.heroku.com/comet-watcher/web
+
+    - name: Push the image to Heroku
+      run: docker push registry.heroku.com/comet-watcher/web 
