@@ -1,0 +1,31 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deploy to Heroku
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Get the version
+      id: vars
+      run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
+
+    - name: Build docker image
+      run: DOCKER_BUILDKIT=1 docker build -t eshishkin/comet-watcher:${{steps.vars.outputs.tag}} .
+    
+    -name: Login in Heroku
+      run: docker login --username={{ secrets.HEROKU_USER_NAME }} --password={{ secrets.HEROKU_API_KEY }} registry.heroku.com
+    
+    - name: Tag image with Heroku specific format
+      run: docker tag eshishkin/comet-watcher:${{steps.vars.outputs.tag}} registry.heroku.com/comet-watcher/release
+
+    - name: Deploy to Heroku
+      run: docker push registry.heroku.com/comet-watcher/release
