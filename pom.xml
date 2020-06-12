@@ -30,6 +30,7 @@
         <check.test.skip>false</check.test.skip>
 
         <skipTests>${check.test.skip}</skipTests>
+        <mongo-java-driver.version>3.12.5</mongo-java-driver.version>
     </properties>
 
     <profiles>
@@ -116,6 +117,12 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-validator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>${mongo-java-driver.version}</version>
         </dependency>
 
         <dependency>

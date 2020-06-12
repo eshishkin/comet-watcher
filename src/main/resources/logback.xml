@@ -34,5 +34,6 @@
     </root>
 
     <logger name="org.eshishkin.edu.cometwatcher.external" level="DEBUG"/>
+    <logger name="org.mongodb.driver" level="INFO"/>
 
 </configuration>

@@ -2,30 +2,34 @@ package org.eshishkin.edu.cometwatcher.config;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
 
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
-import org.eshishkin.edu.cometwatcher.external.subscription.ExternalSubscriberClient;
 import org.eshishkin.edu.cometwatcher.utils.LoggingInterceptor;
 import org.slf4j.LoggerFactory;
 
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 @Dependent
 public class ClientConfiguration {
 
-    private static final int DEFAULT_CONNECTION_TIMEOUT = 30;
-    private static final int DEFAULT_READ_TIMEOUT = 2;
+    private static final int DEFAULT_CONNECTION_TIMEOUT = 30_000;
+    private static final int DEFAULT_READ_TIMEOUT = 180_000;
 
     @Produces
     @ApplicationScoped
@@ -40,19 +44,27 @@ public class ClientConfiguration {
 
     @Produces
     @ApplicationScoped
-    public ExternalSubscriberClient externalSubscriberService(
-            @ConfigProperty(name = "application.external.subscribers.url") String url,
-            @ConfigProperty(name = "application.external.subscribers.user") String user,
-            @ConfigProperty(name = "application.external.subscribers.password") String password) {
+    public MongoClient mongoClient(
+            @ConfigProperty(name = "application.datasource.url") String url,
+            @ConfigProperty(name = "application.datasource.port") int port,
+            @ConfigProperty(name = "application.datasource.database") String database,
+            @ConfigProperty(name = "application.datasource.user") String user,
+            @ConfigProperty(name = "application.datasource.password") String password) {
 
-        return getDefaultBuilder()
-                .baseUrl(toURL(url))
-                .register((ClientRequestFilter) context -> context.getHeaders().add(
-                        HttpHeaders.AUTHORIZATION,
-                        "Basic " + Base64.getEncoder().encodeToString(format("%s:%s", user, password).getBytes(UTF_8))
-                ))
-                .register(new LoggingInterceptor(LoggerFactory.getLogger(ExternalSubscriberClient.class)))
-                .build(ExternalSubscriberClient.class);
+        CodecRegistry registry = fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().automatic(true).build())
+        );
+
+        return new MongoClient(
+                new ServerAddress(url, port),
+                MongoCredential.createCredential(user, database, password.toCharArray()),
+                MongoClientOptions.builder()
+                        .connectTimeout(DEFAULT_CONNECTION_TIMEOUT)
+                        .socketTimeout(DEFAULT_READ_TIMEOUT)
+                        .codecRegistry(registry)
+                        .build()
+        );
     }
 
     private URL toURL(String url) {
@@ -65,7 +77,7 @@ public class ClientConfiguration {
 
     private RestClientBuilder getDefaultBuilder() {
         return RestClientBuilder.newBuilder()
-                .connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.MINUTES);
+                .connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
+                .readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.MILLISECONDS);
     }
 }

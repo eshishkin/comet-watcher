@@ -11,15 +11,16 @@ services:
         aliases:
           - smtp.comet-watcher.com
   db:
-    image: apache/couchdb:latest
+    image: mongo:4.2.7
     mem_limit: 64m
+    restart: always
     environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=password
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
     expose:
-      - "5984"
-    volumes:
-      - comet-watcher-db:/var/lib/couchdb
+      - "27017"
+    ports:
+      - "27017:27017"
     networks:
       backend:
         aliases:
@@ -39,6 +40,3 @@ services:
 
 networks:
   backend:
-
-volumes:
-  comet-watcher-db:
