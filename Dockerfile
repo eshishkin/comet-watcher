@@ -13,7 +13,11 @@ RUN --mount=type=cache,target=/root/.m2 mvn -Dquarkus.profile=${PROFILE} -Puber-
 
 
 FROM adoptopenjdk:14-jre-hotspot
-ENV PORT=8080
+
 COPY --from=builder /project/target/comet-watcher-runner.jar .
-ENTRYPOINT ["java", "-Dquarkus.http.port=${PORT}","-jar", "comet-watcher-runner.jar"]
+COPY --from=builder /project/etc/wrapper-docker.sh .
+
+RUN ["chmod", "+x", "wrapper-docker.sh"]
+
+CMD ["./wrapper-docker.sh"]
 

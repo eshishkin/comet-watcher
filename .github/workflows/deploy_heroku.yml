@@ -15,17 +15,29 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Get the version
-      id: vars
+      id: version
       run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
 
     - name: Build docker image
-      run: DOCKER_BUILDKIT=1 docker build -t eshishkin/comet-watcher:${{steps.vars.outputs.tag}} .
+      run: DOCKER_BUILDKIT=1 docker build --build-arg PROFILE=heroku -t eshishkin/comet-watcher:${{steps.version.outputs.tag}} .
 
     - name: Login in Heroku
       run: echo ${{ secrets.HEROKU_API_KEY }} | docker login registry.heroku.com -u ${{ secrets.HEROKU_USER_NAME }} --password-stdin
 
     - name: Tag image with Heroku specific format
-      run: docker tag eshishkin/comet-watcher:${{steps.vars.outputs.tag}} registry.heroku.com/comet-watcher/web
+      run: docker tag eshishkin/comet-watcher:${{steps.version.outputs.tag}} registry.heroku.com/comet-watcher/web
+
+    - name: Calculate image hash
+      id: image
+      run: echo ::set-output name=image_id::$(echo $(docker inspect registry.heroku.com/comet-watcher/web --format={{.Id}}))
 
     - name: Push the image to Heroku
-      run: docker push registry.heroku.com/comet-watcher/web 
+      run: docker push registry.heroku.com/comet-watcher/web
+
+    - name: Deploy to Heroku
+      run: |
+        curl -X PATCH https://api.heroku.com/apps/comet-watcher/formation \
+        -d '{"updates" : [ {"type": "web", "docker_image": "${{steps.image.outputs.image_id}}"} ] }'  \
+        -H "Content-Type: application/json"  \
+        -H "Accept: application/vnd.heroku+json; version=3.docker-releases"  \
+        -H "Authorization: Bearer ${{ secrets.HEROKU_API_KEY }}"
