@@ -3,8 +3,8 @@ package org.eshishkin.edu.cometwatcher.service;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
-
 import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 
 import org.eshishkin.edu.cometwatcher.model.Subscription;
