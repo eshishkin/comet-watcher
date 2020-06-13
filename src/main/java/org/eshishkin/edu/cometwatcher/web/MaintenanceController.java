@@ -1,7 +1,5 @@
 package org.eshishkin.edu.cometwatcher.web;
 
-import java.util.List;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -16,7 +14,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eshishkin.edu.cometwatcher.exception.InvalidDataException;
-import org.eshishkin.edu.cometwatcher.model.Subscription;
 import org.eshishkin.edu.cometwatcher.model.SubscriptionRequest;
 import org.eshishkin.edu.cometwatcher.service.ScheduledNotifier;
 import org.eshishkin.edu.cometwatcher.service.SubscriberService;
@@ -34,16 +31,27 @@ public class MaintenanceController {
     private final SubscriberService subscriberService;
 
     @POST
-    @Path("/notify")
-    public Response send() {
+    @Path("/run")
+    public Response run() {
         notifier.send();
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/send")
+    public Response send(@QueryParam("email") String email) {
+        if (StringUtils.isBlank(email)) {
+            throw new InvalidDataException("Empty email");
+        }
+
+        notifier.send(email);
         return Response.ok().build();
     }
 
     @GET
     @Path("/subscribers")
-    public List<Subscription> subscribers() {
-        return subscriberService.getSubscriptions();
+    public Response subscribers() {
+        return Response.status(Response.Status.FORBIDDEN).build();
     }
 
     @POST

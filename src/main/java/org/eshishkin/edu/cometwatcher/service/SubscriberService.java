@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
 
+import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.eshishkin.edu.cometwatcher.model.Subscription;
@@ -20,6 +21,10 @@ public class SubscriberService {
 
     public List<Subscription> getSubscriptions() {
         return subscriberRepository.findAll();
+    }
+
+    public Optional<Subscription> findByEmail(String email) {
+        return subscriberRepository.get(email);
     }
 
     public void subscribe(SubscriptionRequest request) {

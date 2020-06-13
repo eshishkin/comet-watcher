@@ -2,6 +2,7 @@ package org.eshishkin.edu.cometwatcher.service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,13 @@ public class ScheduledNotifier {
     @ConfigProperty(name = "application.mail.templates.comet-report.subject")
     String subject;
 
+    public void send(String email) {
+        subscriberService.findByEmail(email).ifPresent(s -> {
+            GeoRequest geo = GeoRequest.of(s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude());
+            send(render(cometService.getComets(geo)), Collections.singletonList(s));
+        });
+    }
+
     @Scheduled(cron = "{application.schedulers.comet-notifier}")
     public void send() {
         Instant now = Instant.now();
@@ -59,7 +67,7 @@ public class ScheduledNotifier {
             return;
         }
 
-        subscriptions.entrySet().stream().forEach(e -> {
+        subscriptions.entrySet().forEach(e -> {
             GeoRequest geo = e.getKey();
             List<Subscription> subscribers = e.getValue();
 
