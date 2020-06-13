@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
@@ -16,21 +18,22 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 
 import io.quarkus.arc.profile.UnlessBuildProfile;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import static com.mongodb.client.model.Filters.eq;
 
 @ApplicationScoped
-@AllArgsConstructor
 @UnlessBuildProfile("local")
 public class PersistentSubscriberRepository implements SubscriberRepository {
 
     private static final String SUBSCRIBER_COLLECTION = "subscriber";
     private static final String ID = "_id";
-    private static final String DATABASE = "comet_watcher_db";
 
-    private final MongoClient client;
+    @Inject
+    MongoClient client;
+
+    @ConfigProperty(name = "application.datasource.database")
+    String database;
 
     @Override
     public List<Subscription> findAll() {
@@ -67,7 +70,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
     }
 
     private MongoCollection<SubscriptionRecord> getCollection() {
-        return client.getDatabase(DATABASE).getCollection(SUBSCRIBER_COLLECTION, SubscriptionRecord.class);
+        return client.getDatabase(database).getCollection(SUBSCRIBER_COLLECTION, SubscriptionRecord.class);
     }
 
     private Subscription toBusinessModel(SubscriptionRecord external) {

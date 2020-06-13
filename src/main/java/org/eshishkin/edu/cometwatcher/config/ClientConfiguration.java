@@ -63,6 +63,7 @@ public class ClientConfiguration {
                         .connectTimeout(DEFAULT_CONNECTION_TIMEOUT)
                         .socketTimeout(DEFAULT_READ_TIMEOUT)
                         .codecRegistry(registry)
+                        .retryWrites(false)
                         .build()
         );
     }
