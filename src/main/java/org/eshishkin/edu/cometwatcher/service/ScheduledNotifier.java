@@ -6,11 +6,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.model.Comet;
+import org.eshishkin.edu.cometwatcher.model.CometStub;
 import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
@@ -21,6 +23,7 @@ import io.quarkus.qute.Template;
 import io.quarkus.qute.api.ResourcePath;
 import io.quarkus.scheduler.Scheduled;
 import lombok.extern.slf4j.Slf4j;
+import org.eshishkin.edu.cometwatcher.repository.CometExternalRepository;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -33,7 +36,7 @@ public class ScheduledNotifier {
     SubscriberService subscriberService;
 
     @Inject
-    CometService cometService;
+    CometExternalRepository cometService;
 
     @Inject
     Mailer sender;
@@ -55,36 +58,31 @@ public class ScheduledNotifier {
     public void send() {
         Instant now = Instant.now();
 
-        Map<GeoRequest, List<Subscription>> subscriptions = subscriberService
+        List<Subscription> subscriptions = subscriberService
                 .getSubscriptions()
                 .stream()
                 .filter(s -> now.isAfter(calculateNextTryDate(s)))
-                .collect(groupingBy(
-                    s -> GeoRequest.of(s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude())
-                ));
+                .collect(toList());
 
         if (subscriptions.isEmpty()) {
             log.info("There is no active subscription");
             return;
         }
 
-        subscriptions.forEach((key, subscribers) -> {
-            List<Comet> comets = cometService.getComets(key);
-            subscribers.forEach(s -> {
-                String message;
+        subscriptions.forEach(s -> {
+            GeoRequest geo = GeoRequest.of(s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude());
+            List<Comet> comets = cometService.getCometStubs(geo)
+                    .stream()
+                    .filter(comet ->
+                        s.getDesiredStarMagnitude() == null || comet.getBrightness() <= s.getDesiredStarMagnitude()
+                    )
+                    .map(CometStub::getId)
+                    .map(id -> cometService.getComet(id, geo))
+                    .collect(toList());
 
-                if (s.getDesiredStarMagnitude() == null) {
-                    message = render(comets);
-                } else {
-                    message = render(comets.stream()
-                            .filter(comet -> comet.getBrightness() <= s.getDesiredStarMagnitude())
-                            .collect(toList())
-                    );
-                }
+            send(render(comets), Collections.singletonList(s));
 
-                send(message, subscribers);
-            });
-        });
+        });;
     }
 
     private void send(String payload, List<Subscription> subscriptions) {

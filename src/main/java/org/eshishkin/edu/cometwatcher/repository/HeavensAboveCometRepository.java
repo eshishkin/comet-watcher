@@ -7,21 +7,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.enterprise.context.ApplicationScoped;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.model.Comet;
+import org.eshishkin.edu.cometwatcher.model.CometStub;
 import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import static java.net.URLDecoder.decode;
 import static java.util.stream.Collectors.toList;
 
@@ -37,6 +34,26 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
     @Override
     public List<Comet> getComets() {
         return getComets(GeoRequest.asNullIsland());
+    }
+
+    @Override
+    public List<CometStub> getCometStubs(GeoRequest observer) {
+        return getListOfComets(observer)
+                .stream()
+                .filter(row -> StringUtils.isNotBlank(row.getName()))
+                .map(row -> {
+                    CometStub stub = new CometStub();
+                    stub.setId(row.getId());
+                    stub.setName(row.getName());
+                    stub.setBrightness(row.getBrightness());
+                    return stub;
+                })
+                .collect(toList());
+    }
+
+    @Override
+    public Comet getComet(String cometId, GeoRequest observer) {
+        return new Comet();
     }
 
     @Override
