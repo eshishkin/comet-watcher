@@ -4,9 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -23,9 +21,7 @@ import io.quarkus.qute.Template;
 import io.quarkus.qute.api.ResourcePath;
 import io.quarkus.scheduler.Scheduled;
 import lombok.extern.slf4j.Slf4j;
-import org.eshishkin.edu.cometwatcher.repository.CometExternalRepository;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -36,7 +32,7 @@ public class ScheduledNotifier {
     SubscriberService subscriberService;
 
     @Inject
-    CometExternalRepository cometService;
+    CometService cometService;
 
     @Inject
     Mailer sender;
@@ -48,10 +44,8 @@ public class ScheduledNotifier {
     String subject;
 
     public void send(String email) {
-        subscriberService.findByEmail(email).ifPresent(s -> {
-            GeoRequest geo = GeoRequest.of(s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude());
-            send(render(cometService.getComets(geo)), Collections.singletonList(s));
-        });
+        subscriberService.findByEmail(email)
+                .ifPresent(s -> send(render(evaluateComets(s)), s));
     }
 
     @Scheduled(cron = "{application.schedulers.comet-notifier}")
@@ -69,20 +63,11 @@ public class ScheduledNotifier {
             return;
         }
 
-        subscriptions.forEach(s -> {
-            GeoRequest geo = GeoRequest.of(s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude());
-            List<Comet> comets = cometService.getCometStubs(geo)
-                    .stream()
-                    .filter(comet ->
-                        s.getDesiredStarMagnitude() == null || comet.getBrightness() <= s.getDesiredStarMagnitude()
-                    )
-                    .map(CometStub::getId)
-                    .map(id -> cometService.getComet(id, geo))
-                    .collect(toList());
+        subscriptions.forEach(s -> send(render(evaluateComets(s)), s));
+    }
 
-            send(render(comets), Collections.singletonList(s));
-
-        });;
+    private void send(String payload, Subscription subscription) {
+        send(payload, Collections.singletonList(subscription));
     }
 
     private void send(String payload, List<Subscription> subscriptions) {
@@ -122,5 +107,21 @@ public class ScheduledNotifier {
                 .data("comets", comets)
                 .data("generated_at", Instant.now())
                 .render();
+    }
+
+    private List<Comet> evaluateComets(Subscription s) {
+        GeoRequest observer = GeoRequest.of(
+                s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude()
+        );
+
+        return cometService.getComets(observer)
+                .stream()
+                .filter(comet ->
+                    s.getDesiredStarMagnitude() == null || comet.getBrightness() <= s.getDesiredStarMagnitude()
+                )
+                .map(CometStub::getId)
+                .map(id -> cometService.getComet(id, observer))
+                .collect(toList());
+
     }
 }

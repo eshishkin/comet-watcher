@@ -8,11 +8,7 @@ import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 
 public interface CometExternalRepository {
 
-    List<Comet> getComets();
+    List<CometStub> getComets(GeoRequest observer);
 
-    List<Comet> getComets(GeoRequest observer);
-
-    List<CometStub> getCometStubs(GeoRequest observer);
-
-    Comet getComet(String cometId, GeoRequest observer);
+    Comet getComets(String cometId, GeoRequest observer);
 }

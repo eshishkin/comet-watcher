@@ -5,9 +5,11 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.eshishkin.edu.cometwatcher.model.Comet;
+import org.eshishkin.edu.cometwatcher.model.CometStub;
 import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 import org.eshishkin.edu.cometwatcher.repository.CometExternalRepository;
 
+import io.quarkus.cache.CacheResult;
 import lombok.AllArgsConstructor;
 
 @ApplicationScoped
@@ -16,11 +18,13 @@ public class CometService {
 
     private final CometExternalRepository cometExternalRepository;
 
-    public List<Comet> getComets() {
-        return cometExternalRepository.getComets();
+    @CacheResult(cacheName = "comet_list")
+    public List<CometStub> getComets(GeoRequest observer) {
+        return cometExternalRepository.getComets(observer);
     }
 
-    public List<Comet> getComets(GeoRequest request) {
-        return cometExternalRepository.getComets(request);
+    @CacheResult(cacheName = "comet_by_id")
+    public Comet getComet(String cometId, GeoRequest observer) {
+        return cometExternalRepository.getComets(cometId, observer);
     }
 }
