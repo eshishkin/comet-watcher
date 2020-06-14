@@ -45,6 +45,7 @@ public class SubscriberService {
     private Subscription toSubscription(SubscriptionRequest request) {
         Subscription subscription = new Subscription();
         subscription.setEmail(request.getEmail());
+        subscription.setDesiredStarMagnitude(request.getDesiredStarMagnitude());
         subscription.setObserverAltitude(request.getObserverAltitude());
         subscription.setObserverLatitude(request.getObserverLatitude());
         subscription.setObserverLongitude(request.getObserverLongitude());

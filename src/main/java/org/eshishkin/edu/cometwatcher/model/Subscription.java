@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class Subscription {
     private String email;
+    private Float desiredStarMagnitude;
     private String observerLatitude;
     private String observerLongitude;
     private int observerAltitude;

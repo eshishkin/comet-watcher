@@ -76,6 +76,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
     private Subscription toBusinessModel(SubscriptionRecord external) {
         Subscription subscription = new Subscription();
         subscription.setEmail(external.getEmail());
+        subscription.setDesiredStarMagnitude(external.getDesiredStarMagnitude());
         subscription.setInterval(external.getInterval());
         subscription.setObserverAltitude(external.getObserverAltitude());
         subscription.setObserverLatitude(external.getObserverLatitude());
@@ -88,6 +89,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
     private SubscriptionRecord toExternalModel(Subscription subscription) {
         SubscriptionRecord external = new SubscriptionRecord();
         external.setEmail(subscription.getEmail());
+        external.setDesiredStarMagnitude(subscription.getDesiredStarMagnitude());
         external.setInterval(subscription.getInterval());
         external.setObserverAltitude(subscription.getObserverAltitude());
         external.setObserverLatitude(subscription.getObserverLatitude());
@@ -102,6 +104,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
 
         @BsonId
         private String email;
+        private Float desiredStarMagnitude;
         private String observerLatitude;
         private String observerLongitude;
         private int observerAltitude;

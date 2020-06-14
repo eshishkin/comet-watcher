@@ -28,4 +28,5 @@ public class SubscriptionRequest {
     @NotNull
     private ScheduleInterval interval;
 
+    private Float desiredStarMagnitude;
 }

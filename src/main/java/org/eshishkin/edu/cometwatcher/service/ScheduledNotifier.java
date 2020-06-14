@@ -23,6 +23,7 @@ import io.quarkus.scheduler.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @ApplicationScoped
@@ -67,11 +68,22 @@ public class ScheduledNotifier {
             return;
         }
 
-        subscriptions.entrySet().forEach(e -> {
-            GeoRequest geo = e.getKey();
-            List<Subscription> subscribers = e.getValue();
+        subscriptions.forEach((key, subscribers) -> {
+            List<Comet> comets = cometService.getComets(key);
+            subscribers.forEach(s -> {
+                String message;
 
-            send(render(cometService.getComets(geo)), subscribers);
+                if (s.getDesiredStarMagnitude() == null) {
+                    message = render(comets);
+                } else {
+                    message = render(comets.stream()
+                            .filter(comet -> comet.getBrightness() <= s.getDesiredStarMagnitude())
+                            .collect(toList())
+                    );
+                }
+
+                send(message, subscribers);
+            });
         });
     }
 
