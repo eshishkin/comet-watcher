@@ -1,11 +1,15 @@
 package org.eshishkin.edu.cometwatcher.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 public class Comet {
@@ -37,8 +41,22 @@ public class Comet {
 
     private String eccentricity;
 
-    private String rigthAccession;
+    private String rightAccession;
 
     private String declination;
 
+    private List<ImageLink> links;
+
+    @Getter @Setter
+    public static class ImageLink implements Serializable {
+        private String description;
+        private String link;
+
+        public static ImageLink of(String description, String link) {
+            ImageLink resource = new ImageLink();
+            resource.setDescription(description);
+            resource.setLink(link);
+            return resource;
+        }
+    }
 }

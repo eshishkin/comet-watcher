@@ -1,31 +1,38 @@
 package org.eshishkin.edu.cometwatcher.repository.heavensabove;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.model.Comet;
+import org.eshishkin.edu.cometwatcher.model.Comet.ImageLink;
 import org.eshishkin.edu.cometwatcher.model.CometStub;
 import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 import org.eshishkin.edu.cometwatcher.repository.CometExternalRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @ApplicationScoped
-@AllArgsConstructor
 public class HeavensAboveCometRepository implements CometExternalRepository {
 
     private static final String GMT = "GMT";
     private static final String SELECTOR_TABLE_SECOND_COLUMN = "tr > td:nth-child(2)";
-    private final HeavensAboveExternalService heavensAboveExternalService;
+
+    @ConfigProperty(name = "application.external.heavens-above.url")
+    String url;
+
+    @Inject
+    HeavensAboveExternalService heavensAboveExternalService;
 
     @Override
     public List<CometStub> getComets(GeoRequest observer) {
@@ -57,7 +64,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
         comet.setDirection(data.getAzimuthDirection());
         comet.setConstellation(data.getConstellation());
 
-        comet.setRigthAccession(data.getRigthAccession());
+        comet.setRightAccession(data.getRigthAccession());
         comet.setDeclination(data.getDeclination());
         comet.setDistanceFromEarth(data.getDistanceFromEarth());
 
@@ -66,6 +73,12 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
         comet.setPerihelion(data.getPerihelion());
         comet.setPeriod(data.getPeriod());
         comet.setEccentricity(data.getEccentricity());
+
+
+        comet.setLinks(Arrays.asList(
+                ImageLink.of("Skychart", generateSkyChartLink(data)),
+                ImageLink.of("90° above ecliptic", generateOrbitLink(data))
+        ));
         return comet;
     }
 
@@ -95,6 +108,23 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
                 id,
                 new CometPositionWrapper(position),
                 new CometOrbitWrapper(orbit)
+        );
+    }
+
+    private String generateSkyChartLink(CometDataWrapper data) {
+        String dec = StringUtils.substringBefore(data.getDeclination(), "°").trim();
+        String ra = StringUtils.substringBefore(data.getRigthAccession(), "h").trim();
+
+        return String.format(
+                "%s/skychart.ashx?cometID=%s&RA=%s&DEC=%s&size=400&FOV=70&innerFOV=15&MaxMag=5&cn=1&cl=1",
+                url, data.getName(), ra, dec
+        );
+    }
+
+    private String generateOrbitLink(CometDataWrapper data) {
+        return String.format(
+                "%s/CometOrbitPic.ashx?cid=%s&eclLat=90&eclLong=-90&sz=400",
+                url, data.getName()
         );
     }
 }

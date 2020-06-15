@@ -11,10 +11,9 @@ import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.model.Comet;
 import org.eshishkin.edu.cometwatcher.model.CometStub;
 import org.eshishkin.edu.cometwatcher.model.GeoRequest;
-import org.eshishkin.edu.cometwatcher.repository.CometExternalRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,12 +28,8 @@ public class HeavensAboveCometRepositoryTest {
     @Mock
     private HeavensAboveExternalService heavensAboveExternalService;
 
-    private CometExternalRepository repository;
-
-    @BeforeEach
-    public void before() {
-        repository = new HeavensAboveCometRepository(heavensAboveExternalService);
-    }
+    @InjectMocks
+    private HeavensAboveCometRepository repository;
 
     @Test
     public void testGetComets_Success() {
@@ -70,7 +65,7 @@ public class HeavensAboveCometRepositoryTest {
         assertEquals("WSW", comet.getDirection());
         assertEquals("Puppis", comet.getConstellation());
 
-        assertEquals("7h 54.6m", comet.getRigthAccession());
+        assertEquals("7h 54.6m", comet.getRightAccession());
         assertEquals("-16° 37'", comet.getDeclination());
         assertEquals("0.958 AU", comet.getDistanceFromEarth());
         assertEquals("860.766 AU", comet.getAphelion());
