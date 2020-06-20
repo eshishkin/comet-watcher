@@ -11,15 +11,19 @@ import javax.inject.Inject;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eshishkin.edu.cometwatcher.exception.ResourceAlreadyExistsException;
+import org.eshishkin.edu.cometwatcher.exception.ResourceNotFoundException;
 import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 
 import io.quarkus.arc.profile.UnlessBuildProfile;
 import lombok.Data;
 
+import static com.mongodb.ErrorCategory.DUPLICATE_KEY;
 import static com.mongodb.client.model.Filters.eq;
 
 @ApplicationScoped
@@ -56,7 +60,16 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
 
     @Override
     public void create(Subscription subscription) {
-        getCollection().insertOne(toExternalModel(subscription));
+        try {
+            getCollection().insertOne(toExternalModel(subscription));
+        } catch (MongoWriteException ex) {
+            if (ex.getError().getCategory() != DUPLICATE_KEY) {
+                throw ex;
+            }
+
+            throw new ResourceAlreadyExistsException("Subscription already exists: " + subscription.getEmail());
+        }
+
     }
 
     @Override
@@ -66,7 +79,10 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
 
     @Override
     public void delete(String id) {
-        getCollection().deleteOne(eq(ID, id));
+        SubscriptionRecord deleted = getCollection().findOneAndDelete(eq(ID, id));
+        if (deleted == null) {
+            throw new ResourceNotFoundException("Subscription not found: " + id);
+        }
     }
 
     private MongoCollection<SubscriptionRecord> getCollection() {
