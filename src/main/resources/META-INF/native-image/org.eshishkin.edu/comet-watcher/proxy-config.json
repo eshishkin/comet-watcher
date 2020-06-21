@@ -1,0 +1,4 @@
+[
+  ["org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService","org.jboss.resteasy.client.jaxrs.internal.proxy.ResteasyClientProxy"],
+  ["org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService","org.jboss.resteasy.microprofile.client.RestClientProxy","java.io.Closeable"]
+]

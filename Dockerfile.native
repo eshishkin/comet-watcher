@@ -1,0 +1,42 @@
+# syntax=docker/dockerfile:experimental
+FROM oracle/graalvm-ce:19.3.2-java11 AS builder
+
+RUN yum update -y
+RUN yum install wget -y
+
+RUN wget https://archive.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz -O - | tar xz -C /opt
+RUN ln -s /opt/apache-maven-3.6.2 /opt/maven \
+ && ln -s /opt/graalvm-ce-java11-19.3.2 /opt/graalvm
+
+RUN gu install native-image
+ENV JAVA_HOME=/opt/graalvm
+ENV M2_HOME=/opt/maven
+ENV MAVEN_HOME=/opt/maven
+ENV PATH=${M2_HOME}/bin:${PATH}
+ENV PATH=${JAVA_HOME}/bin:${PATH}
+
+WORKDIR project
+
+ARG PROFILE=local
+
+COPY pom.xml pom.xml
+
+RUN --mount=type=cache,target=/root/.m2 mvn -Puber-jar,native -f pom.xml -B de.qaware.maven:go-offline-maven-plugin:1.2.5:resolve-dependencies
+
+COPY src src
+COPY etc/checkstyle etc/checkstyle
+COPY etc/spotbugs etc/spotbugs
+
+RUN mvn -Dquarkus.profile=${PROFILE} -Puber-jar,no-checks,native clean package
+
+COPY etc/wrapper-docker-native.sh etc/wrapper-docker-native.sh
+
+
+FROM ubuntu:18.04
+
+COPY --from=builder /project/target/comet-watcher-runner .
+COPY --from=builder /project/etc/wrapper-docker-native.sh .
+
+RUN ["chmod", "+x", "wrapper-docker-native.sh"]
+
+CMD ["./wrapper-docker-native.sh"]

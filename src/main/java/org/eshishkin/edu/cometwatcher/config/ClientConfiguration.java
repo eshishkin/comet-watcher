@@ -16,11 +16,11 @@ import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.utils.LoggingInterceptor;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -55,17 +55,17 @@ public class ClientConfiguration {
                 MongoClientSettings.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build())
         );
-
-        return new MongoClient(
-                new ServerAddress(url, port),
-                MongoCredential.createCredential(user, database, password.toCharArray()),
-                MongoClientOptions.builder()
-                        .connectTimeout(DEFAULT_CONNECTION_TIMEOUT)
-                        .socketTimeout(DEFAULT_READ_TIMEOUT)
-                        .codecRegistry(registry)
-                        .retryWrites(false)
-                        .build()
-        );
+        return MongoClients.create(MongoClientSettings
+                .builder()
+                .applyConnectionString(new ConnectionString(String.format("mongodb://%s:%s", url, port)))
+                .applyToSocketSettings(socket -> socket
+                        .connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
+                        .readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.MILLISECONDS)
+                )
+                .credential(MongoCredential.createCredential(user, database, password.toCharArray()))
+                .codecRegistry(registry)
+                .retryWrites(false)
+                .build());
     }
 
     private URL toURL(String url) {

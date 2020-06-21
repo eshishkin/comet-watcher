@@ -11,7 +11,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>13</java.version>
+        <java.version>11</java.version>
 
         <junit.jupiter.version>5.6.2</junit.jupiter.version>
         <jsoup.version>1.13.1</jsoup.version>
@@ -25,8 +25,10 @@
         <spotbugs-maven-plugin.version>4.0.0</spotbugs-maven-plugin.version>
         <testcontainers.version>1.14.3</testcontainers.version>
         <velocity.version>1.7</velocity.version>
-        <mongo-java-driver.version>3.12.5</mongo-java-driver.version>
+<!--        <mongo-java-driver.version>3.12.5</mongo-java-driver.version>-->
+        <mongo-java-driver.version>4.0.4</mongo-java-driver.version>
 
+        <graal-sdk.version>19.3.1</graal-sdk.version>
 
         <check.checkstyle.skip>false</check.checkstyle.skip>
         <check.spotbugs.skip>false</check.spotbugs.skip>
@@ -34,6 +36,8 @@
         <check.test.skip>false</check.test.skip>
 
         <skipTests>${check.test.skip}</skipTests>
+
+        <graalvm.native.skip>true</graalvm.native.skip>
     </properties>
 
     <profiles>
@@ -60,6 +64,35 @@
             <properties>
                 <quarkus.package.uber-jar>true</quarkus.package.uber-jar>
             </properties>
+        </profile>
+
+        <profile>
+            <id>native</id>
+
+            <properties>
+                <quarkus.package.type>native</quarkus.package.type>
+                <graalvm.native.skip>false</graalvm.native.skip>
+                <quarkus.native.additional-build-args>-H:+TraceClassInitialization,--verbose,--allow-incomplete-classpath,--initialize-at-run-time=com.mongodb.internal.event.ServerListenerMulticaster,--initialize-at-run-time=com.cronutils.model.time.generator.AndFieldValueGenerator,--initialize-at-run-time=com.mongodb.internal.connection.ZstdCompressor</quarkus.native.additional-build-args>
+            </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>com.github.jnr</groupId>
+                    <artifactId>jnr-unixsocket</artifactId>
+                    <version>0.18</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>mongodb-crypt</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.xerial.snappy</groupId>
+                    <artifactId>snappy-java</artifactId>
+                    <version>1.1.4</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 
@@ -104,12 +137,12 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.slf4j</groupId>
-                    <artifactId>slf4j-jboss-logging</artifactId>
-                </exclusion>
-            </exclusions>
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.jboss.slf4j</groupId>-->
+<!--                    <artifactId>slf4j-jboss-logging</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
 
         <dependency>
@@ -129,7 +162,7 @@
 
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
+            <artifactId>mongodb-driver-sync</artifactId>
             <version>${mongo-java-driver.version}</version>
         </dependency>
 
@@ -157,11 +190,11 @@
             <version>1.7.30</version>
         </dependency>
 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-classic</artifactId>-->
+<!--            <version>1.2.3</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -236,6 +269,43 @@
                     <release>${java.version}</release>
                 </configuration>
             </plugin>
+
+<!--            <plugin>-->
+<!--                <groupId>io.quarkus</groupId>-->
+<!--                <artifactId>quarkus-bootstrap-maven-plugin</artifactId>-->
+<!--            </plugin>-->
+
+<!--            <plugin>-->
+<!--                <groupId>org.graalvm.nativeimage</groupId>-->
+<!--&lt;!&ndash;                <groupId>com.oracle.substratevm</groupId>&ndash;&gt;-->
+<!--                <artifactId>native-image-maven-plugin</artifactId>-->
+<!--                <version>${graal-sdk.version}</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>native-image</goal>-->
+<!--                        </goals>-->
+<!--                        <phase>package</phase>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <skip>${graalvm.native.skip}</skip>-->
+<!--                    <imageName>example</imageName>-->
+<!--                    <mainClass>org.eshishkin.edu.cometwatcher.Application</mainClass>-->
+<!--                    <buildArgs>-->
+<!--                        &#45;&#45;no-server-->
+<!--                        &#45;&#45;verbose-->
+<!--                        &#45;&#45;allow-incomplete-classpath-->
+<!--                        &#45;&#45;initialize-at-run-time=com.mongodb.internal.event.ServerListenerMulticaster-->
+<!--                        &#45;&#45;initialize-at-run-time=com.cronutils.model.time.generator.AndFieldValueGenerator-->
+<!--                        &#45;&#45;initialize-at-run-time=com.mongodb.internal.connection.ZstdCompressor-->
+<!--                        -H:+TraceClassInitialization-->
+<!--                        -H:+ReportExceptionStackTraces-->
+<!--                        &#45;&#45;initialize-at-build-time=org.jboss.logging.Logger-->
+<!--                        &#45;&#45;initialize-at-build-time=org.jboss.logging.LoggerProviders-->
+<!--                    </buildArgs>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
