@@ -19,7 +19,7 @@ jobs:
       run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
 
     - name: Build docker image
-      run: DOCKER_BUILDKIT=1 docker build --build-arg PROFILE=heroku -t eshishkin/comet-watcher:${{steps.version.outputs.tag}} .
+      run: DOCKER_BUILDKIT=1 docker build -f Dockerfile.native --build-arg PROFILE=heroku -t eshishkin/comet-watcher:${{steps.version.outputs.tag}} .
 
     - name: Login in Heroku
       run: echo ${{ secrets.HEROKU_API_KEY }} | docker login registry.heroku.com -u ${{ secrets.HEROKU_USER_NAME }} --password-stdin
