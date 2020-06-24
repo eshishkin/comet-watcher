@@ -1,0 +1,19 @@
+{
+  "resources":[
+    {"pattern":"\\QMETA-INF/services/io.quarkus.qute.PublisherFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/io.smallrye.config.SmallRyeConfigFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/io.smallrye.mutiny.infrastructure.MultiInterceptor\\E"}, 
+    {"pattern":"\\QMETA-INF/services/io.smallrye.mutiny.infrastructure.UniInterceptor\\E"}, 
+    {"pattern":"\\QMETA-INF/services/io.vertx.core.spi.BufferFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/io.vertx.core.spi.FutureFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.eclipse.microprofile.config.spi.ConfigSource\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.eclipse.microprofile.config.spi.Converter\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.eclipse.microprofile.context.spi.ContextManagerExtension\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.eclipse.microprofile.context.spi.ContextManagerProvider\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.eclipse.microprofile.context.spi.ThreadContextProvider\\E"}, 
+    {"pattern":"\\Qapplication.properties\\E"}, 
+    {"pattern":"\\Qorg/jboss/threads/Version.properties\\E"}, 
+    {"pattern":"\\Qtemplates/comets/comet-report.html\\E"}
+  ],
+  "bundles":[]
+}

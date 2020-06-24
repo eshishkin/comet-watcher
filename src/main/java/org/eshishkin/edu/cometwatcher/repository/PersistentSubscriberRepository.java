@@ -16,8 +16,8 @@ import org.eshishkin.edu.cometwatcher.exception.ResourceNotFoundException;
 import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
-import com.mongodb.MongoClient;
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 
 import io.quarkus.arc.profile.UnlessBuildProfile;

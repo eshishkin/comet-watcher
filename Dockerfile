@@ -7,9 +7,12 @@ ARG PROFILE=local
 
 COPY pom.xml pom.xml
 COPY src src
-COPY etc etc
+COPY etc/checkstyle etc/checkstyle
+COPY etc/spotbugs etc/spotbugs
 
 RUN --mount=type=cache,target=/root/.m2 mvn -Dquarkus.profile=${PROFILE} -Puber-jar clean package
+
+COPY etc/wrapper-docker.sh etc/wrapper-docker.sh
 
 
 FROM adoptopenjdk:14-jre-hotspot

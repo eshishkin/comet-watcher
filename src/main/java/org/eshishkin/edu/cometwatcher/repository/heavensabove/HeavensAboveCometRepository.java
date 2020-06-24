@@ -17,11 +17,8 @@ import org.eshishkin.edu.cometwatcher.repository.CometExternalRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 
-import lombok.extern.slf4j.Slf4j;
-
 import static java.util.stream.Collectors.toList;
 
-@Slf4j
 @ApplicationScoped
 public class HeavensAboveCometRepository implements CometExternalRepository {
 
