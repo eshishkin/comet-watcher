@@ -1,65 +1,5 @@
 [
 {
-  "name":"ch.qos.logback.classic.Logger",
-  "methods":[{"name":"log","parameterTypes":["org.slf4j.event.LoggingEvent"] }]
-},
-{
-  "name":"ch.qos.logback.classic.encoder.PatternLayoutEncoder",
-  "allPublicMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.classic.pattern.DateConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.classic.pattern.LevelConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.classic.pattern.LineSeparatorConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.classic.pattern.LoggerConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.classic.pattern.MessageConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.classic.pattern.ThreadConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.core.ConsoleAppender",
-  "allPublicMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.core.rolling.RollingFileAppender",
-  "allPublicMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy",
-  "allPublicMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.core.rolling.helper.DateTokenConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.core.rolling.helper.IntegerTokenConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"ch.qos.logback.core.util.FileSize",
-  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
-},
-{
   "name":"com.fasterxml.jackson.databind.ext.Java7HandlersImpl",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
@@ -406,9 +346,6 @@
   "allDeclaredMethods":true
 },
 {
-  "name":"javax.management.ObjectName"
-},
-{
   "name":"javax.net.ssl.SSLEngine",
   "methods":[{"name":"getApplicationProtocol","parameterTypes":[] }]
 },
@@ -423,9 +360,6 @@
 },
 {
   "name":"javax.ws.rs.container.ContainerResponseFilter[]"
-},
-{
-  "name":"javax.ws.rs.ext.WriterInterceptor[]"
 },
 {
   "name":"jdk.internal.misc.Unsafe",
@@ -450,12 +384,6 @@
 },
 {
   "name":"org.eshishkin.edu.cometwatcher.model.ScheduleInterval",
-  "allDeclaredFields":true,
-  "allDeclaredMethods":true,
-  "allDeclaredConstructors":true
-},
-{
-  "name":"org.eshishkin.edu.cometwatcher.model.Subscription",
   "allDeclaredFields":true,
   "allDeclaredMethods":true,
   "allDeclaredConstructors":true

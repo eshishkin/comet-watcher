@@ -25,7 +25,6 @@
         <spotbugs-maven-plugin.version>4.0.0</spotbugs-maven-plugin.version>
         <testcontainers.version>1.14.3</testcontainers.version>
         <velocity.version>1.7</velocity.version>
-<!--        <mongo-java-driver.version>3.12.5</mongo-java-driver.version>-->
         <mongo-java-driver.version>4.0.4</mongo-java-driver.version>
 
         <graal-sdk.version>19.3.1</graal-sdk.version>
@@ -38,6 +37,8 @@
         <skipTests>${check.test.skip}</skipTests>
 
         <graalvm.native.skip>true</graalvm.native.skip>
+
+        <final-name>comet-watcher</final-name>
     </properties>
 
     <profiles>
@@ -72,7 +73,14 @@
             <properties>
                 <quarkus.package.type>native</quarkus.package.type>
                 <graalvm.native.skip>false</graalvm.native.skip>
-                <quarkus.native.additional-build-args>-H:+TraceClassInitialization,--verbose,--allow-incomplete-classpath,--initialize-at-run-time=com.mongodb.internal.event.ServerListenerMulticaster,--initialize-at-run-time=com.cronutils.model.time.generator.AndFieldValueGenerator,--initialize-at-run-time=com.mongodb.internal.connection.ZstdCompressor</quarkus.native.additional-build-args>
+                <quarkus.native.additional-build-args>
+                    -H:+TraceClassInitialization,
+                    --verbose,
+                    --allow-incomplete-classpath,
+                    --initialize-at-run-time=com.mongodb.internal.event.ServerListenerMulticaster,
+                    --initialize-at-run-time=com.cronutils.model.time.generator.AndFieldValueGenerator,
+                    --initialize-at-run-time=com.mongodb.internal.connection.ZstdCompressor
+                </quarkus.native.additional-build-args>
             </properties>
 
             <dependencies>
@@ -137,12 +145,6 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-core</artifactId>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.jboss.slf4j</groupId>-->
-<!--                    <artifactId>slf4j-jboss-logging</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
         </dependency>
 
         <dependency>
@@ -189,12 +191,6 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.30</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>ch.qos.logback</groupId>-->
-<!--            <artifactId>logback-classic</artifactId>-->
-<!--            <version>1.2.3</version>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -259,7 +255,7 @@
     </dependencies>
 
     <build>
-        <finalName>comet-watcher</finalName>
+        <finalName>${final-name}</finalName>
 
         <plugins>
             <plugin>
@@ -269,43 +265,6 @@
                     <release>${java.version}</release>
                 </configuration>
             </plugin>
-
-<!--            <plugin>-->
-<!--                <groupId>io.quarkus</groupId>-->
-<!--                <artifactId>quarkus-bootstrap-maven-plugin</artifactId>-->
-<!--            </plugin>-->
-
-<!--            <plugin>-->
-<!--                <groupId>org.graalvm.nativeimage</groupId>-->
-<!--&lt;!&ndash;                <groupId>com.oracle.substratevm</groupId>&ndash;&gt;-->
-<!--                <artifactId>native-image-maven-plugin</artifactId>-->
-<!--                <version>${graal-sdk.version}</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>native-image</goal>-->
-<!--                        </goals>-->
-<!--                        <phase>package</phase>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <skip>${graalvm.native.skip}</skip>-->
-<!--                    <imageName>example</imageName>-->
-<!--                    <mainClass>org.eshishkin.edu.cometwatcher.Application</mainClass>-->
-<!--                    <buildArgs>-->
-<!--                        &#45;&#45;no-server-->
-<!--                        &#45;&#45;verbose-->
-<!--                        &#45;&#45;allow-incomplete-classpath-->
-<!--                        &#45;&#45;initialize-at-run-time=com.mongodb.internal.event.ServerListenerMulticaster-->
-<!--                        &#45;&#45;initialize-at-run-time=com.cronutils.model.time.generator.AndFieldValueGenerator-->
-<!--                        &#45;&#45;initialize-at-run-time=com.mongodb.internal.connection.ZstdCompressor-->
-<!--                        -H:+TraceClassInitialization-->
-<!--                        -H:+ReportExceptionStackTraces-->
-<!--                        &#45;&#45;initialize-at-build-time=org.jboss.logging.Logger-->
-<!--                        &#45;&#45;initialize-at-build-time=org.jboss.logging.LoggerProviders-->
-<!--                    </buildArgs>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -435,6 +394,11 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <native.image.path>${project.build.directory}/${final-name}-runner</native.image.path>
+                            </systemPropertyVariables>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
