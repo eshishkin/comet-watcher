@@ -4,6 +4,7 @@ import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.annotations.QuarkusMain;
 
 @QuarkusMain
+@SuppressWarnings("HideUtilityClassConstructor")
 public class Application {
 
     public static void main(String... args) {
