@@ -33,7 +33,9 @@ public class Comet {
 
     private String distanceFromEarth;
 
-    private String perihelion;
+    private String perihelionDistance;
+
+    private String perihelionDate;
 
     private String aphelion;
 

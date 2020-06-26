@@ -5,19 +5,40 @@
         <title>Periodical report about upcoming comets</title>
     </head>
     <body>
-        <h2>Periodical report about upcoming comets</h2>
         Dear user,
 
-        <p>A list of upcoming comets is generated</p>
+        <p>Here is a list of comets that might be observable in this month</p>
 
-        <ul>
-            {#for comet in comets}
-                <li style="margin: 5px 0px 5px 0px;"><span style="text-decoration: underline;"><b>{comet.name}</b> ({comet.constellation})</span> - mag: <b>{comet.brightness}</b>, altitude: {comet.altitude}, azimuth: {comet.azimuth}</li>
-            {/for}
-        </ul>
+        {#for comet in comets}
+        <div style="margin-bottom:5px">
+            <p style="font-size: x-large;text-decoration: underline;">{comet.name} ({comet.constellation})</p>
+
+            <p style="margin-left:20px">
+                Current brightness is <b><u>{comet.brightness}</u></b>.
+
+                <br>
+
+                The comet {comet.name} is now in {comet.constellation} constellation -
+                with altitude <b>{comet.altitude}</b> and azimuth <b>{comet.azimuth} ({comet.direction})</b>.
+
+                <br>
+
+                The period of {comet.name} is {comet.period ?: unknown} (eccentricity {comet.eccentricity}),
+                perihelion is expected on <b><u>{comet.perihelionDate}</u></b>
+                (distance from the Sun {comet.perihelionDistance} AU)
+            </p>
+
+            <p style="margin-left:20px">
+                {#for image in comet.links}
+                    <img src="{image.link}" style="margin:5px"/>
+                {/for}
+            </p>
+        </div>
+        {/for}
 
         <br>
-        <p><b>Report generated at: {generated_at}</b></p>
+
+        <p>Generated at: <u>{generated_at}</u></p>
 
         <p>
             Sincerely,<br>

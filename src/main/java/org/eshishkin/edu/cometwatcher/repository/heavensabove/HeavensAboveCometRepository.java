@@ -67,7 +67,8 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
 
         comet.setDistanceFromSun(data.getDistanceFromSun());
         comet.setAphelion(data.getAphelion());
-        comet.setPerihelion(data.getPerihelion());
+        comet.setPerihelionDistance(data.getPerihelionDistance());
+        comet.setPerihelionDate(data.getPerihelionDate());
         comet.setPeriod(data.getPeriod());
         comet.setEccentricity(data.getEccentricity());
 
@@ -120,7 +121,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
 
     private String generateOrbitLink(CometDataWrapper data) {
         return String.format(
-                "%s/CometOrbitPic.ashx?cid=%s&eclLat=90&eclLong=-90&sz=400",
+                "%s/CometOrbitPic.aspx?cid=%s&eclLat=90&eclLong=-90&sz=400",
                 url, data.getName()
         );
     }

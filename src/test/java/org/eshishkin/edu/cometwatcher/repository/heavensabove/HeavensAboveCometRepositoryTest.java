@@ -69,7 +69,8 @@ public class HeavensAboveCometRepositoryTest {
         assertEquals("-16° 37'", comet.getDeclination());
         assertEquals("0.958 AU", comet.getDistanceFromEarth());
         assertEquals("860.766 AU", comet.getAphelion());
-        assertEquals("0.914 AU (2020-Jun-18)", comet.getPerihelion());
+        assertEquals("0.914", comet.getPerihelionDistance());
+        assertEquals("2020-Jun-18", comet.getPerihelionDate());
         assertEquals("0.929 AU", comet.getDistanceFromSun());
         assertEquals("0.997878", comet.getEccentricity());
         assertEquals("8,943 years", comet.getPeriod());

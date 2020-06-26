@@ -6,6 +6,8 @@ services:
     mem_limit: 32m
     expose:
       - "25"
+    ports:
+      - "10025:25"
     networks:
       backend:
         aliases:

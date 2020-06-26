@@ -1,11 +1,16 @@
 package org.eshishkin.edu.cometwatcher.repository.heavensabove;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.jsoup.select.Elements;
 
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 final class CometOrbitWrapper {
+    private static final Pattern PERIHELION_PATTERN = Pattern.compile("(.*) AU \\((.*)\\)");
+
     private final Elements row;
 
     @SuppressWarnings("MagicNumber")
@@ -14,8 +19,17 @@ final class CometOrbitWrapper {
     }
 
     @SuppressWarnings("MagicNumber")
-    public String getPerihelion() {
-        return row.get(1).text();
+    public String getPerihelionDistance() {
+        String value = row.get(1).text();
+        Matcher matcher = PERIHELION_PATTERN.matcher(value);
+        return matcher.matches() ? matcher.group(1) : null;
+    }
+
+    @SuppressWarnings("MagicNumber")
+    public String getPerihelionDate() {
+        String value = row.get(1).text();
+        Matcher matcher = PERIHELION_PATTERN.matcher(value);
+        return matcher.matches() ? matcher.group(2) : null;
     }
 
     @SuppressWarnings("MagicNumber")
