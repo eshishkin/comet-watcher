@@ -8,4 +8,5 @@ exec ./comet-watcher-runner -Dquarkus.http.port=$PORT \
           -Denv.mongo.pwd=$MONGO_COMET_WATCHER_PWD \
           -Denv.mail.smtp.user=$SENDGRID_USERNAME \
           -Denv.mail.smtp.password=$SENDGRID_PASSWORD \
+          -Djavax.net.ssl.trustStore=cacerts \
           -Xms64m -Xmx64m -Xss1m

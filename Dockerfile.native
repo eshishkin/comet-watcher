@@ -27,7 +27,7 @@ COPY src src
 COPY etc/checkstyle etc/checkstyle
 COPY etc/spotbugs etc/spotbugs
 
-RUN mvn -Dquarkus.profile=${PROFILE} -Puber-jar,no-checks,native clean package
+RUN mvn -Dquarkus.profile=${PROFILE} -Puber-jar,native clean package
 
 COPY etc/wrapper-docker-native.sh etc/wrapper-docker-native.sh
 
@@ -36,7 +36,7 @@ FROM ubuntu:18.04
 
 COPY --from=builder /project/target/comet-watcher-runner .
 COPY --from=builder /project/etc/wrapper-docker-native.sh .
-
+COPY --from=builder /opt/graalvm/lib/security/cacerts cacerts
 RUN ["chmod", "+x", "wrapper-docker-native.sh"]
 
 CMD ["./wrapper-docker-native.sh"]
