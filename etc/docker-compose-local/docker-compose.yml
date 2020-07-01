@@ -57,7 +57,8 @@ services:
                     vault kv put secret/applications/comet-watcher/config
                           datasource.mongo_url=mongodb://comet_watcher_usr:comet_watcher_pwd@database.comet-watcher.com:27017/comet_watcher_db
                           datasource.database=comet_watcher_db
-                          smtp.user=user smtp.password=admin"
+                          smtp.user=user smtp.password=admin
+                          application.encryption_key=0123456789abcdef"
     environment:
       - VAULT_ADDR=http://vault.comet-watcher.com:8200
     depends_on:

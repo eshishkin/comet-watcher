@@ -61,7 +61,8 @@ public class VaultTestResource implements QuarkusTestResourceLifecycleManager {
         String[] otherSecrets = {
                 "datasource.database=test_db",
                 "smtp.user=user",
-                "smtp.password=password"
+                "smtp.password=password",
+                "application.encryption_key=0123456789abcdef"
         };
 
         try(VaultContainer<?> ctr = new VaultContainer<>(VAULT_IMAGE)) {

@@ -47,8 +47,16 @@ public class SubscriberController {
 
     @DELETE
     @Path("/{email}")
-    public Response subscribe(@PathParam("email") String email) {
+    public Response unsubscribe(@PathParam("email") String email) {
         subscriberService.unsubscribe(email);
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @GET
+    @Deprecated
+    @Path("/token/{token}")
+    public Response unsubscribeViaToken(@PathParam("token") String token) {
+        subscriberService.unsubscribeViaToken(token);
+        return Response.status(Response.Status.OK).build();
     }
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.model.Comet;
 import org.eshishkin.edu.cometwatcher.model.CometStub;
 import org.eshishkin.edu.cometwatcher.model.GeoRequest;
@@ -17,8 +16,6 @@ import org.eshishkin.edu.cometwatcher.model.Subscription;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
-import io.quarkus.qute.Template;
-import io.quarkus.qute.api.ResourcePath;
 import io.quarkus.scheduler.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,17 +32,15 @@ public class ScheduledNotifier {
     CometService cometService;
 
     @Inject
+    CometReportRenderer renderer;
+
+    @Inject
     Mailer sender;
 
-    @ResourcePath("comets/comet-report")
-    Template template;
-
-    @ConfigProperty(name = "application.mail.templates.comet-report.subject")
-    String subject;
-
     public void send(String email) {
-        subscriberService.findByEmail(email)
-                .ifPresent(s -> send(render(evaluateComets(s)), s));
+        subscriberService.findByEmail(email).ifPresent(
+            s -> send(renderer.render(s, evaluateComets(s)), s)
+        );
     }
 
     @Scheduled(cron = "{application.schedulers.comet-notifier}")
@@ -63,7 +58,7 @@ public class ScheduledNotifier {
             return;
         }
 
-        subscriptions.forEach(s -> send(render(evaluateComets(s)), s));
+        subscriptions.forEach(s -> send(renderer.render(s, evaluateComets(s)), s));
     }
 
     private void send(String payload, Subscription subscription) {
@@ -72,7 +67,7 @@ public class ScheduledNotifier {
 
     private void send(String payload, List<Subscription> subscriptions) {
         subscriptions.stream().map(Subscription::getEmail).forEach(email -> {
-            sender.send(Mail.withHtml(email, subject, payload));
+            sender.send(Mail.withHtml(email, renderer.getSubject(), payload));
             subscriberService.updateLastTryDate(email);
         });
     }
@@ -100,13 +95,6 @@ public class ScheduledNotifier {
         }
 
         return next;
-    }
-
-    private String render(List<Comet> comets) {
-        return template
-                .data("comets", comets)
-                .data("generated_at", Instant.now())
-                .render();
     }
 
     private List<Comet> evaluateComets(Subscription s) {
