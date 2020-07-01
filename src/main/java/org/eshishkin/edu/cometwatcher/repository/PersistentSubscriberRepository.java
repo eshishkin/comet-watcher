@@ -36,7 +36,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
     @Inject
     MongoClient client;
 
-    @ConfigProperty(name = "application.datasource.database")
+    @ConfigProperty(name = "datasource.database")
     String database;
 
     @Override

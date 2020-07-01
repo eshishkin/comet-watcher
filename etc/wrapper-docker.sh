@@ -1,12 +1,7 @@
 #!/bin/bash
 
-exec java -Dquarkus.http.port=$PORT \
-          -Denv.mongo.url=$MONGO_HOST \
-          -Denv.mongo.port=$MONGO_PORT \
-          -Denv.mongo.db=$MONGO_COMET_WATCHER_DB \
-          -Denv.mongo.usr=$MONGO_COMET_WATCHER_USR \
-          -Denv.mongo.pwd=$MONGO_COMET_WATCHER_PWD \
-          -Denv.mail.smtp.user=$SENDGRID_USERNAME \
-          -Denv.mail.smtp.password=$SENDGRID_PASSWORD \
+exec java -Denv.port=$PORT \
+          -Denv.vault.url=$VAULT_HOST \
+          -Denv.vault.token=$VAULT_TOKEN \
           -Xms64m -Xmx64m -Xss1m \
           -jar comet-watcher-runner.jar

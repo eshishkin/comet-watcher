@@ -14,6 +14,8 @@ public class MongoTestResource implements QuarkusTestResourceLifecycleManager {
     private static final int MONGO_PORT = 27017;
     private static final String ADMIN = "admin";
 
+    public static final String ENV_MONGO_PORT = "env.mongo.port";
+
     private GenericContainer<?> mongo;
 
     @Override
@@ -22,12 +24,7 @@ public class MongoTestResource implements QuarkusTestResourceLifecycleManager {
 
         log.info("MongoDB has been started at {}:{}", mongo.getHost(), mongo.getMappedPort(MONGO_PORT));
 
-        System.setProperty("env.mongo.url", mongo.getHost());
-        System.setProperty("env.mongo.port", String.valueOf(mongo.getMappedPort(MONGO_PORT)));
-        System.setProperty("env.mongo.db", "test_db");
-        System.setProperty("env.mongo.usr", "test_user");
-        System.setProperty("env.mongo.pwd", "test_password");
-
+        System.setProperty(ENV_MONGO_PORT, String.valueOf(mongo.getMappedPort(MONGO_PORT)));
 
         return Collections.emptyMap();
     }
@@ -35,6 +32,9 @@ public class MongoTestResource implements QuarkusTestResourceLifecycleManager {
     @Override
     public void stop() {
         log.info("Stopping MongoDB");
+
+        System.clearProperty(ENV_MONGO_PORT);
+
         mongo.stop();
         log.info("MongoDB is successfully stopped");
     }

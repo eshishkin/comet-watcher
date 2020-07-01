@@ -1,0 +1,86 @@
+version: "2"
+
+services:
+  smtp:
+    image: namshi/smtp:latest
+    mem_limit: 32m
+    expose:
+      - "25"
+    ports:
+      - "10025:25"
+    networks:
+      backend:
+        aliases:
+          - smtp.comet-watcher.com
+
+  db:
+    image: mongo:4.2.7
+    mem_limit: 64m
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+    volumes:
+      - "./mongo/mongo_startup.js:/docker-entrypoint-initdb.d/mongo_startup.js"
+    networks:
+      backend:
+        aliases:
+          - database.comet-watcher.com
+
+  vault:
+    image: vault:1.4.2
+    mem_limit: 64m
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:8200
+      - VAULT_API_ADDR=http://127.0.0.1:8200
+      - VAULT_DEV_ROOT_TOKEN_ID=82ff7092-bb8c-11ea-9159-5309046f7c36
+    expose:
+      - "8200"
+    ports:
+      - "18200:8200"
+    cap_add:
+      - IPC_LOCK
+    networks:
+      backend:
+        aliases:
+          - vault.comet-watcher.com
+
+  vault-populator:
+    image: vault:1.4.2
+    mem_limit: 64m
+    cap_add:
+      - IPC_LOCK
+    command: sh -c "vault login 82ff7092-bb8c-11ea-9159-5309046f7c36 &&
+                    vault kv put secret/applications/comet-watcher/config
+                          datasource.mongo_url=mongodb://comet_watcher_usr:comet_watcher_pwd@database.comet-watcher.com:27017/comet_watcher_db
+                          datasource.database=comet_watcher_db
+                          smtp.user=user smtp.password=admin"
+    environment:
+      - VAULT_ADDR=http://vault.comet-watcher.com:8200
+    depends_on:
+      - vault
+    networks:
+      backend:
+
+  app:
+    image: eshishkin/comet-watcher:latest
+    mem_limit: 128m
+    environment:
+      - VAULT_HOST=http://vault.comet-watcher.com:8200
+      - VAULT_TOKEN=82ff7092-bb8c-11ea-9159-5309046f7c36
+    expose:
+      - "8080"
+    ports:
+      - "18080:8080"
+    depends_on:
+      - smtp
+      - db
+      - vault-populator
+    networks:
+      backend:
+
+networks:
+  backend:

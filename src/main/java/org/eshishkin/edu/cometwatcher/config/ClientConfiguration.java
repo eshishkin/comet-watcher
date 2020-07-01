@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
@@ -44,25 +43,19 @@ public class ClientConfiguration {
 
     @Produces
     @ApplicationScoped
-    public MongoClient mongoClient(
-            @ConfigProperty(name = "application.datasource.url") String url,
-            @ConfigProperty(name = "application.datasource.port") int port,
-            @ConfigProperty(name = "application.datasource.database") String database,
-            @ConfigProperty(name = "application.datasource.user") String user,
-            @ConfigProperty(name = "application.datasource.password") String password) {
-
+    public MongoClient mongoClient(@ConfigProperty(name = "datasource.mongo_url") String url) {
         CodecRegistry registry = fromRegistries(
                 MongoClientSettings.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build())
         );
+
         return MongoClients.create(MongoClientSettings
                 .builder()
-                .applyConnectionString(new ConnectionString(String.format("mongodb://%s:%s", url, port)))
+                .applyConnectionString(new ConnectionString(url))
                 .applyToSocketSettings(socket -> socket
                         .connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
                         .readTimeout(DEFAULT_READ_TIMEOUT, TimeUnit.MILLISECONDS)
                 )
-                .credential(MongoCredential.createCredential(user, database, password.toCharArray()))
                 .codecRegistry(registry)
                 .retryWrites(false)
                 .build());
