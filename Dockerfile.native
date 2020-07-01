@@ -27,7 +27,7 @@ COPY src src
 COPY etc/checkstyle etc/checkstyle
 COPY etc/spotbugs etc/spotbugs
 
-RUN mvn -Dquarkus.profile=${PROFILE} -Puber-jar,native clean package
+RUN --mount=type=cache,target=/root/.m2 mvn -Dquarkus.profile=${PROFILE} -Puber-jar,native clean package
 
 COPY etc/wrapper-docker-native.sh etc/wrapper-docker-native.sh
 
