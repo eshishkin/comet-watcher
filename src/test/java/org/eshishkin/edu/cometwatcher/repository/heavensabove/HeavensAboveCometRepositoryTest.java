@@ -3,8 +3,11 @@ package org.eshishkin.edu.cometwatcher.repository.heavensabove;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
@@ -27,6 +30,9 @@ public class HeavensAboveCometRepositoryTest {
 
     @Mock
     private HeavensAboveExternalService heavensAboveExternalService;
+
+    @Mock
+    private Clock clock;
 
     @InjectMocks
     private HeavensAboveCometRepository repository;
@@ -52,6 +58,9 @@ public class HeavensAboveCometRepositoryTest {
 
     @Test
     public void testGetComet() {
+        doReturn(Instant.parse("2020-01-01T00:00:00Z")).when(clock).instant();
+        doReturn(ZoneId.of("UTC")).when(clock).getZone();
+
         doReturn(load("HeavensAboveCometRepositoryTest_CometPage.html"))
                 .when(heavensAboveExternalService).getComet("C/2019 U6", "0", "0", 0, "GMT");
 

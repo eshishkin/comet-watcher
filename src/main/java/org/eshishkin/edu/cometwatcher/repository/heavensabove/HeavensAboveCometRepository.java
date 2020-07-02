@@ -1,5 +1,8 @@
 package org.eshishkin.edu.cometwatcher.repository.heavensabove;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.temporal.JulianFields;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,6 +33,9 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
 
     @Inject
     HeavensAboveExternalService heavensAboveExternalService;
+
+    @Inject
+    Clock clock;
 
     @Override
     public List<CometStub> getComets(GeoRequest observer) {
@@ -112,17 +118,20 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
     private String generateSkyChartLink(CometDataWrapper data) {
         String dec = StringUtils.substringBefore(data.getDeclination(), "°").trim();
         String ra = StringUtils.substringBefore(data.getRigthAccession(), "h").trim();
+        long date = LocalDate.ofInstant(clock.instant(), clock.getZone()).getLong(JulianFields.MODIFIED_JULIAN_DAY);
 
         return String.format(
-                "%s/skychart.ashx?cometID=%s&RA=%s&DEC=%s&size=400&FOV=70&innerFOV=15&MaxMag=5&cn=1&cl=1",
-                url, data.getName(), ra, dec
+                "%s/skychart.ashx?cometID=%s&RA=%s&DEC=%s&size=400&FOV=70&innerFOV=15&MaxMag=5&cn=1&cl=1&mjd=%s",
+                url, data.getName(), ra, dec, date
         );
     }
 
     private String generateOrbitLink(CometDataWrapper data) {
+        long date = LocalDate.ofInstant(clock.instant(), clock.getZone()).getLong(JulianFields.MODIFIED_JULIAN_DAY);
+
         return String.format(
-                "%s/CometOrbitPic.aspx?cid=%s&eclLat=90&eclLong=-90&sz=400",
-                url, data.getName()
+                "%s/CometOrbitPic.aspx?cid=%s&eclLat=90&eclLong=-90&sz=400&mjd=%s",
+                url, data.getName(), date
         );
     }
 }
