@@ -5,6 +5,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.testcontainers.vault.VaultContainer;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
@@ -16,7 +17,8 @@ public class VaultTestResource implements QuarkusTestResourceLifecycleManager {
     private static final String VAULT_TEST_TOKEN = "vault-test-token";
     private static final String VAULT_IMAGE = "vault:1.4.2";
 
-    private static final String VAULT_SECRET_PATH = "secret/applications/comet-watcher/config";
+    private static final String VAULT_SECRET_CONFIG_PATH = "secret/applications/comet-watcher/config";
+    private static final String VAULT_SECRET_USER_PATH_PATTERN = "secret/applications/comet-watcher/users/%s";
 
     private static final String ENV_VAULT_URL = "env.vault.url";
     private static final String ENV_VAULT_TOKEN = "env.vault.token";
@@ -53,6 +55,30 @@ public class VaultTestResource implements QuarkusTestResourceLifecycleManager {
     private VaultContainer<?> run() {
         VaultContainer<?> container;
 
+        Pair<String, String[]> secretConfig = getSecretConfig();
+
+        try(VaultContainer<?> ctr = new VaultContainer<>(VAULT_IMAGE)) {
+            container = ctr
+                    .withExposedPorts(VAULT_PORT)
+                    .withVaultToken(VAULT_TEST_TOKEN)
+                    .withSecretInVault(VAULT_SECRET_CONFIG_PATH, secretConfig.getKey(), secretConfig.getValue())
+                    .withSecretInVault(
+                            format(VAULT_SECRET_USER_PATH_PATTERN, "admin"),
+                            getUserName("Admin"), getUserAttributes("qwerty", "admin")
+                    )
+                    .withSecretInVault(
+                            format(VAULT_SECRET_USER_PATH_PATTERN, "user"),
+                            getUserName("User"), getUserAttributes("qwerty", "role")
+                    );
+
+        }
+
+        container.start();
+
+        return container;
+    }
+
+    private Pair<String, String[]> getSecretConfig() {
         String mongoUrl = format(
                 "datasource.mongo_url=mongodb://test_user:test_password@localhost:%s/test_db",
                 System.getProperty(MongoTestResource.ENV_MONGO_PORT)
@@ -65,19 +91,18 @@ public class VaultTestResource implements QuarkusTestResourceLifecycleManager {
                 "application.encryption_key=0123456789abcdef"
         };
 
-        try(VaultContainer<?> ctr = new VaultContainer<>(VAULT_IMAGE)) {
-            container = ctr
-                    .withExposedPorts(VAULT_PORT)
-                    .withVaultToken(VAULT_TEST_TOKEN)
-                    .withSecretInVault(VAULT_SECRET_PATH, mongoUrl, otherSecrets);
-
-        }
-
-        container.start();
-
-        return container;
+        return Pair.of(mongoUrl, otherSecrets);
     }
 
+    private String getUserName(String name) {
+        return "name=" + name;
+    }
+    private String[] getUserAttributes(String password, String role) {
+        return new String[] {
+                "password=" + password,
+                "role=" + role
+        };
+    }
 
     @Override
     public int order() {

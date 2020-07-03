@@ -54,6 +54,7 @@ services:
     cap_add:
       - IPC_LOCK
     command: sh -c "vault login 82ff7092-bb8c-11ea-9159-5309046f7c36 &&
+                    vault kv put secret/applications/comet-watcher/users/admin name=Administrator password=qwerty role=admin &&
                     vault kv put secret/applications/comet-watcher/config
                           datasource.mongo_url=mongodb://comet_watcher_usr:comet_watcher_pwd@database.comet-watcher.com:27017/comet_watcher_db
                           datasource.database=comet_watcher_db

@@ -33,6 +33,35 @@ public class SubscriberControllerITCase {
         );
     }
 
+    @Test
+    public void testGettingAllSubscribers_NoPermissions() {
+        given()
+                .when()
+                    .accept(ContentType.JSON)
+                    .get("/subscribers")
+                .then()
+                    .log().all()
+                    .statusCode(401);
+    }
+
+    @Test
+    public void testGettingAllSubscribers() {
+        String email = getEmail();
+
+        create(email).statusCode(201);
+
+        given()
+                .when()
+                    .accept(ContentType.JSON)
+                    .auth().basic("admin", "qwerty")
+                    .get("/subscribers")
+                .then()
+                    .log().all()
+                    .statusCode(200)
+                    .body("[0].email", is(email));
+
+        delete(email).statusCode(204);
+    }
 
     @Test
     public void testSuccessfulCreation() {

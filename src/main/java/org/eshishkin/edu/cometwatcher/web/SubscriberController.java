@@ -1,5 +1,8 @@
 package org.eshishkin.edu.cometwatcher.web;
 
+import java.util.List;
+
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
@@ -12,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.eshishkin.edu.cometwatcher.model.Roles;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 import org.eshishkin.edu.cometwatcher.model.SubscriptionRequest;
 import org.eshishkin.edu.cometwatcher.service.SubscriberService;
@@ -28,8 +32,9 @@ public class SubscriberController {
     private final SubscriberService subscriberService;
 
     @GET
-    public Response subscribers() {
-        return Response.status(Response.Status.FORBIDDEN).build();
+    @RolesAllowed(Roles.ADMIN)
+    public List<Subscription> subscribers() {
+        return subscriberService.getSubscriptions();
     }
 
     @GET
