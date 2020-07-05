@@ -26,7 +26,6 @@ The following command will build an artifact anr run a set of tests
 
 ```
 ./mvnw clean verify
-
 ```  
 
 To compile the app without any checks `no-checks` profile can be used
@@ -34,7 +33,6 @@ To compile the app without any checks `no-checks` profile can be used
 
 ```
 ./mvnw -Pno-checks clean verify
-
 ```
 
 Native images are build using `native` maven profile
@@ -42,7 +40,6 @@ Native images are build using `native` maven profile
 
 ```
 ./mvnw -Pno-checks,native clean verify
-
 ```
 
 ### Building with docker
@@ -57,8 +54,20 @@ To build an image the following commands can be used
 DOCKER_BUILDKIT=1 docker build --build-arg PROFILE={your profile} -t comet-watcher:latest .
 
 DOCKER_BUILDKIT=1 docker build -f Dockerfile.native --build-arg PROFILE={your profile} -t comet-watcher:latest .
-
 ```
 
 **NB:** Due to the nature of native image build procedure, it is memory and time consuming operation. I was very surprised
 when it took 5-7 minutes to build the app. 
+
+### Running the application locally
+
+There is a convenient way to run the application using docker-compose file.
+To run it locally you need 
+
+- Build the app using `docker-test` quarkus profile 
+    ```
+    DOCKER_BUILDKIT=1 docker build --build-arg PROFILE=docker-test -t eshishkin/comet-watcher:latest .
+    ```
+- Run [docker-compose](etc/docker-compose-local/docker-compose.yml) via `docker-compose up` command
+
+It will run the application on port `18080` and all required services (smtp, mongo, vault)
