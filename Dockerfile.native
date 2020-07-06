@@ -37,6 +37,8 @@ FROM ubuntu:18.04
 COPY --from=builder /project/target/comet-watcher-runner .
 COPY --from=builder /project/etc/wrapper-docker-native.sh .
 COPY --from=builder /opt/graalvm/lib/security/cacerts cacerts
+
+RUN apt-get update && apt-get install -y curl
 RUN ["chmod", "+x", "wrapper-docker-native.sh"]
 
 CMD ["./wrapper-docker-native.sh"]
