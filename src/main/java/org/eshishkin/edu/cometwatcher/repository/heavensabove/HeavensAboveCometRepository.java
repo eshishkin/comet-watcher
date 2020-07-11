@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.temporal.JulianFields;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
 
     private static final String GMT = "GMT";
     private static final String SELECTOR_TABLE_SECOND_COLUMN = "tr > td:nth-child(2)";
+    private static final int MINUTES_IN_DEGREE = 60;
 
     @ConfigProperty(name = "application.external.heavens-above.url")
     String url;
@@ -116,12 +118,13 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
     }
 
     private String generateSkyChartLink(CometDataWrapper data) {
-        String dec = StringUtils.substringBefore(data.getDeclination(), "°").trim();
-        String ra = StringUtils.substringBefore(data.getRigthAccession(), "h").trim();
+        float dec = parseDeclinationToDegrees(data.getDeclination());
+        float ra = parseRightAccessionToDegrees(data.getRigthAccession());
         long date = LocalDate.ofInstant(clock.instant(), clock.getZone()).getLong(JulianFields.MODIFIED_JULIAN_DAY);
 
         return String.format(
-                "%s/skychart.ashx?cometID=%s&RA=%s&DEC=%s&size=400&FOV=70&innerFOV=15&MaxMag=5&cn=1&cl=1&mjd=%s",
+                java.util.Locale.US,
+                "%s/skychart.ashx?cometID=%s&RA=%.8f&DEC=%.8f&size=400&FOV=70&innerFOV=15&MaxMag=5&cn=1&cl=1&mjd=%s",
                 url, data.getName(), ra, dec, date
         );
     }
@@ -133,5 +136,26 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
                 "%s/CometOrbitPic.aspx?cid=%s&eclLat=90&eclLong=-90&sz=400&mjd=%s",
                 url, data.getName(), date
         );
+    }
+
+    private float parseRightAccessionToDegrees(String ra) {
+        return parseAsDegree(ra, "h", "m");
+    }
+
+    private float parseDeclinationToDegrees(String dec) {
+        return parseAsDegree(dec, "°", "'");
+    }
+
+    private float parseAsDegree(String string, String degreeSeparator, String minuteSeparator) {
+        int degrees = Integer.parseInt(StringUtils.substringBefore(string, degreeSeparator).trim());
+        float minutes = Optional.of(string)
+                .map(v -> StringUtils.substringBetween(v, degreeSeparator, minuteSeparator))
+                .map(String::trim)
+                .filter(StringUtils::isNotBlank)
+                .map(Float::parseFloat)
+                .map(value -> value / MINUTES_IN_DEGREE)
+                .orElse(0f);
+
+        return degrees + minutes;
     }
 }
