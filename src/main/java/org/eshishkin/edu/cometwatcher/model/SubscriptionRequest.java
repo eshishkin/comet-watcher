@@ -29,4 +29,6 @@ public class SubscriptionRequest {
     private ScheduleInterval interval;
 
     private Float desiredStarMagnitude;
+
+    private Language language;
 }

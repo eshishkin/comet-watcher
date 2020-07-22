@@ -15,4 +15,5 @@ public class Subscription {
     private ZoneId observerTimeZone;
     private ScheduleInterval interval;
     private Instant lastSentOn;
+    private Language language;
 }

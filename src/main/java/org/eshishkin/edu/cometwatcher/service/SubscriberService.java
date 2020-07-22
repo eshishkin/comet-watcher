@@ -70,6 +70,7 @@ public class SubscriberService {
         subscription.setObserverTimeZone(ZoneId.of("UTC"));
         subscription.setInterval(request.getInterval());
         subscription.setLastSentOn(Instant.now());
+        subscription.setLanguage(request.getLanguage());
         return subscription;
     }
 }

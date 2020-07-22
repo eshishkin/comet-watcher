@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Periodical report about upcoming comets</title>
+    </head>
+    <body>
+        <p>Список комет, доступных для наблюдения в этом месяце</p>
+
+        {#for comet in comets}
+        <div style="margin-bottom:5px">
+            <p style="font-size: x-large;text-decoration: underline;">{comet.name} ({comet.constellation})</p>
+
+            <p style="margin-left:20px">
+                Текущая звездная величина (яркость) <b><u>{comet.brightness}</u></b>.
+
+                <br>
+
+                Комета {comet.name} сейчас находится в созвездии {comet.constellation} -
+                на высоте <b>{comet.altitude}</b> градусов, с азимутом <b>{comet.azimuth} градусов ({comet.direction})</b>.
+
+                <br>
+
+                Период кометы {comet.name} составляет {comet.period ?: unknown} (эксцентриситет орбиты {comet.eccentricity}).
+                Комета достигнет своего перигелия <b><u>{comet.perihelionDate}</u></b>
+                (расстояние от Солнца {comet.perihelionDistance} астрономических единиц)
+            </p>
+
+            <p style="margin-left:20px">
+                {#for image in comet.links}
+                    <img src="{image.link}" style="margin:5px"/>
+                {/for}
+            </p>
+        </div>
+        {/for}
+
+        <br>
+
+        <p>Данные актуальны на момент: <u>{generated_at}</u></p>
+
+        <p>
+            Sincerely,<br>
+            Comet Watcher App Team
+        </p>
+
+        <br/>
+
+        <p style="font-size: smaller;color: lightgray">
+            Это письмо сгенерировано автоматически. Пожалуйста, не отвечайте на него. Если вы не заинтересованы в
+            рассылке и не хотите больше получать письма, вы можете отписаться от рассылки,
+            перейдя по <a href="{cancel_subscription_link}">ссылке</a>
+        </p>
+    </body>
+</html>

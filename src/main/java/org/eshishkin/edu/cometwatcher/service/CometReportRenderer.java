@@ -11,17 +11,14 @@ import org.eshishkin.edu.cometwatcher.model.Comet;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 import org.eshishkin.edu.cometwatcher.utils.EncryptionUtils;
 
-import io.quarkus.qute.Template;
-import io.quarkus.qute.api.ResourcePath;
-
 @ApplicationScoped
 public class CometReportRenderer {
 
     @Inject
     EncryptionUtils encryptionUtils;
 
-    @ResourcePath("comets/comet-report")
-    Template template;
+    @Inject
+    TemplateService templateService;
 
     @ConfigProperty(name = "application.mail.templates.comet-report.subject")
     String subject;
@@ -34,7 +31,8 @@ public class CometReportRenderer {
     }
 
     public String render(Subscription subscriber, List<Comet> comets) {
-        return template
+        return templateService
+                .getTemplate("comets/comet-report", subscriber.getLanguage())
                 .data("comets", comets)
                 .data("generated_at", Instant.now())
                 .data("cancel_subscription_link", renderCancellationLink(subscriber.getEmail()))

@@ -13,6 +13,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.exception.ResourceAlreadyExistsException;
 import org.eshishkin.edu.cometwatcher.exception.ResourceNotFoundException;
+import org.eshishkin.edu.cometwatcher.model.Language;
 import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
@@ -99,6 +100,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
         subscription.setObserverLongitude(external.getObserverLongitude());
         subscription.setObserverTimeZone(ZoneId.of(external.getObserverTimeZone()));
         subscription.setLastSentOn(external.getLastSentOn());
+        subscription.setLanguage(external.getLanguage());
         return subscription;
     }
 
@@ -112,6 +114,7 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
         external.setObserverLongitude(subscription.getObserverLongitude());
         external.setObserverTimeZone(subscription.getObserverTimeZone().getId());
         external.setLastSentOn(subscription.getLastSentOn());
+        external.setLanguage(subscription.getLanguage());
         return external;
     }
 
@@ -127,5 +130,6 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
         private String observerTimeZone;
         private ScheduleInterval interval;
         private Instant lastSentOn;
+        private Language language;
     }
 }
