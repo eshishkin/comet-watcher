@@ -10,5 +10,5 @@ public interface CometExternalRepository {
 
     List<CometStub> getComets(GeoRequest observer);
 
-    Comet getComets(String cometId, GeoRequest observer);
+    Comet getComet(String cometId, GeoRequest observer);
 }

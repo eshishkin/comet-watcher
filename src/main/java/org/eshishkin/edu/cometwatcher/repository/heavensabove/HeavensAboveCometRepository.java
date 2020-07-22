@@ -55,7 +55,7 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
     }
 
     @Override
-    public Comet getComets(String cometId, GeoRequest observer) {
+    public Comet getComet(String cometId, GeoRequest observer) {
         return convert(getCometData(cometId, observer));
     }
 

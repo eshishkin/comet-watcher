@@ -64,7 +64,7 @@ public class HeavensAboveCometRepositoryTest {
         doReturn(load("HeavensAboveCometRepositoryTest_CometPage.html"))
                 .when(heavensAboveExternalService).getComet("C/2019 U6", "0", "0", 0, "GMT");
 
-        Comet comet = repository.getComets("C/2019 U6", GeoRequest.asNullIsland());
+        Comet comet = repository.getComet("C/2019 U6", GeoRequest.asNullIsland());
 
         assertEquals("C/2019 U6", comet.getName());
         assertEquals(6.8, comet.getBrightness(), DELTA);

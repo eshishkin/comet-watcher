@@ -25,6 +25,6 @@ public class CometService {
 
     @CacheResult(cacheName = "comet_by_id")
     public Comet getComet(String cometId, GeoRequest observer) {
-        return cometExternalRepository.getComets(cometId, observer);
+        return cometExternalRepository.getComet(cometId, observer);
     }
 }
