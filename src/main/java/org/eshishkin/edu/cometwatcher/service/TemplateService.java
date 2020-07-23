@@ -1,6 +1,8 @@
 package org.eshishkin.edu.cometwatcher.service;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,6 +15,8 @@ import io.quarkus.qute.Template;
 @ApplicationScoped
 public class TemplateService {
 
+    private Map<String, Template> templates = new ConcurrentHashMap<>();
+
     @Inject
     Engine templateEngine;
 
@@ -22,6 +26,6 @@ public class TemplateService {
                 Optional.ofNullable(language).orElse(Language.EN).name().toLowerCase()
         );
 
-        return templateEngine.getTemplate(key);
+        return templates.computeIfAbsent(key, templateEngine::getTemplate);
     }
 }
