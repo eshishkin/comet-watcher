@@ -34,4 +34,4 @@ jobs:
         key: ${{ runner.os }}-docker-cache-{hash}
         restore-keys: |
           ${{ runner.os }}-docker-cache-
-      run: mvn -B test-compile failsafe:integration-test
+        run: mvn -B test-compile failsafe:integration-test
