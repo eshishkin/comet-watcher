@@ -29,4 +29,9 @@ jobs:
     - name: Build with Maven
       run: mvn -B clean package --file pom.xml
     - name: Integration tests
+    - uses: satackey/action-docker-layer-caching@v0.0.3
+      with:
+        key: ${{ runner.os }}-docker-cache-{hash}
+        restore-keys: |
+          ${{ runner.os }}-docker-cache-
       run: mvn -B test-compile failsafe:integration-test
