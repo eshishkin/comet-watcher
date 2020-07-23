@@ -99,7 +99,7 @@ public class ScheduledNotifier {
 
     private List<Comet> evaluateComets(Subscription s) {
         GeoRequest observer = GeoRequest.of(
-                s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude()
+                s.getObserverLatitude(), s.getObserverLongitude(), s.getObserverAltitude(), s.getObserverTimeZone()
         );
 
         return cometService.getComets(observer)

@@ -10,6 +10,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.util.List;
 
+import org.eshishkin.edu.cometwatcher.config.FeatureConfig;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.model.Comet;
 import org.eshishkin.edu.cometwatcher.model.CometStub;
@@ -33,6 +34,9 @@ public class HeavensAboveCometRepositoryTest {
 
     @Mock
     private Clock clock;
+
+    @Mock
+    private FeatureConfig features;
 
     @InjectMocks
     private HeavensAboveCometRepository repository;
@@ -58,6 +62,7 @@ public class HeavensAboveCometRepositoryTest {
 
     @Test
     public void testGetComet() {
+        doReturn(false).when(features).isUseMidnightTime();
         doReturn(Instant.parse("2020-01-01T00:00:00Z")).when(clock).instant();
         doReturn(ZoneId.of("UTC")).when(clock).getZone();
 

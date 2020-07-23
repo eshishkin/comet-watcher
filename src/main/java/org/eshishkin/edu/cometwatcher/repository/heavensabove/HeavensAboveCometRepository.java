@@ -2,6 +2,9 @@ package org.eshishkin.edu.cometwatcher.repository.heavensabove;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.JulianFields;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +15,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eshishkin.edu.cometwatcher.config.FeatureConfig;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
 import org.eshishkin.edu.cometwatcher.model.Comet;
 import org.eshishkin.edu.cometwatcher.model.Comet.ImageLink;
@@ -35,6 +39,9 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
 
     @Inject
     HeavensAboveExternalService heavensAboveExternalService;
+
+    @Inject
+    FeatureConfig features;
 
     @Inject
     Clock clock;
@@ -105,6 +112,10 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
                 observer.getAltitude(), GMT
         );
 
+        if (features.isUseMidnightTime()) {
+            html = getComet(id, observer, Jsoup.parse(html).select("#__VIEWSTATE").val());
+        }
+
         Elements tables = Jsoup.parse(html).select("table.standardTable > tbody");
 
         Elements position = tables.get(0).select(SELECTOR_TABLE_SECOND_COLUMN);
@@ -114,6 +125,27 @@ public class HeavensAboveCometRepository implements CometExternalRepository {
                 id,
                 new CometPositionWrapper(position),
                 new CometOrbitWrapper(orbit)
+        );
+    }
+
+    private String getComet(String id, GeoRequest observer, String aspViewState) {
+        ZonedDateTime now = ZonedDateTime
+                .now(observer.getZone())
+                .truncatedTo(ChronoUnit.DAYS)
+                .plusDays(1)
+                .withZoneSameInstant(ZoneId.of("UTC"));
+
+        return heavensAboveExternalService.getComet(HeavensAboveExternalService.CometRequest.builder()
+                .name(id)
+                .latitude(observer.getLatitude())
+                .longitude(observer.getLongitude())
+                .altitude(observer.getAltitude())
+                .aspViewState(aspViewState)
+                .year(now.getYear())
+                .month(now.getMonth().getValue())
+                .day(now.getDayOfMonth())
+                .time(String.format("%d:%02d:%02d", now.getHour(), now.getMinute(), now.getSecond()))
+                .build()
         );
     }
 
