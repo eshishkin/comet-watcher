@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:experimental
 FROM oracle/graalvm-ce:19.3.2-java11 AS builder
 
-RUN yum update -y
 RUN yum install wget -y
 
 RUN wget https://archive.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz -O - | tar xz -C /opt
