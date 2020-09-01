@@ -6,6 +6,9 @@ WORKDIR project
 ARG PROFILE=local
 
 COPY pom.xml pom.xml
+
+RUN --mount=type=cache,target=/root/.m2 mvn -Puber-jar -f pom.xml -B de.qaware.maven:go-offline-maven-plugin:1.2.5:resolve-dependencies
+
 COPY src src
 COPY etc/checkstyle etc/checkstyle
 COPY etc/spotbugs etc/spotbugs
