@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-config
+data:
+  mongo_startup.js: |-
+    db.getSiblingDB('comet_watcher_db').createUser({
+        user: 'comet_watcher_usr',
+        pwd: 'comet_watcher_pwd',
+        roles: [ { role: 'readWrite', db: 'comet_watcher_db' } ]
+    })

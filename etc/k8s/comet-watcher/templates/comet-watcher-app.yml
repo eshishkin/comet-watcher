@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: comet-watcher
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: comet-watcher-service
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comet-watcher-service
+  labels:
+    app: comet-watcher-service
+spec:
+  replicas: {{ .Values.applications.comet_watcher.replicas }}
+  selector:
+    matchLabels:
+      app: comet-watcher-service
+  template:
+    metadata:
+      labels:
+        app: comet-watcher-service
+    spec:
+      containers:
+        - name: comet-watcher-service
+          image: "eshishkin/comet-watcher:{{ .Values.applications.comet_watcher.tag }}"
+          imagePullPolicy: {{ .Values.applications.comet_watcher.imagePullPolicy }}
+          env:
+            - name: VAULT_HOST
+              value: http://comet-watcher-vault:8200
+            - name: VAULT_TOKEN
+              value: 82ff7092-bb8c-11ea-9159-5309046f7c36
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi

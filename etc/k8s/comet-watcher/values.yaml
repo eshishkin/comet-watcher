@@ -1,0 +1,30 @@
+applications:
+  comet_watcher:
+    tag: latest
+    imagePullPolicy: Never
+    replicas: 1
+
+vault:
+  server:
+    dev:
+      enabled: true
+    livenessProbe:
+      enabled: true
+    postStart:
+      - /bin/sh
+      - -c
+      - >-
+          vault login 82ff7092-bb8c-11ea-9159-5309046f7c36
+          && vault kv put secret/applications/comet-watcher/users/admin name=Administrator password=qwerty role=admin
+          && vault kv put secret/applications/comet-watcher/config datasource.mongo_url=mongodb://comet_watcher_usr:comet_watcher_pwd@comet-watcher-db:27017/comet_watcher_db datasource.database=comet_watcher_db smtp.user=user smtp.password=admin application.encryption_key=0123456789abcdef
+    extraEnvironmentVars:
+      VAULT_DEV_ROOT_TOKEN_ID: 82ff7092-bb8c-11ea-9159-5309046f7c36
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 100m
+      limits:
+        memory: 128Mi
+        cpu: 100m
+  ui:
+    enabled: true

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: comet-watcher-db
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    app: comet-watcher-db
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comet-watcher-db
+  labels:
+    app: comet-watcher-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comet-watcher-db
+  template:
+    metadata:
+      labels:
+        app: comet-watcher-db
+    spec:
+      volumes:
+        - name: mongo-config-storage
+          configMap:
+            name: mongo-config
+        - name: mongo-persistent-storage
+          emptyDir: {}
+      containers:
+        - name: mongo
+          image: mongo:4.2.7
+          volumeMounts:
+            - name: mongo-config-storage
+              mountPath: /docker-entrypoint-initdb.d
+            - name: mongo-persistent-storage
+              mountPath: /data/db

@@ -61,6 +61,8 @@ when it took 5-7 minutes to build the app.
 
 ### Running the application locally
 
+#### Using docker-compose
+
 There is a convenient way to run the application using docker-compose file.
 To run it locally you need 
 
@@ -71,3 +73,16 @@ To run it locally you need
 - Run [docker-compose](etc/docker-compose-local/docker-compose.yml) via `docker-compose up` command
 
 It will run the application on port `18080` and all required services (smtp, mongo, vault)
+
+#### Using Minikube
+
+To run the application in Kubernetes (Minikube) the following steps should be done
+- Run `eval $(minikube docker-env)` so, all docker images will be created in Minikube itself rather than local docker 
+- Build the app using `k8s` quarkus profile 
+    ```
+    DOCKER_BUILDKIT=1 docker build --build-arg PROFILE=k8s -t eshishkin/comet-watcher:latest .
+    ```
+- Go to `etc/k8s/comet-watcher` and execute `helm dependency update`
+- Go to `etc/k8s` and execute `helm upgrade -i comet-watcher comet-watcher/`
+- Run `minikube service comet-watcher --url`
+- Open the url in any browser
