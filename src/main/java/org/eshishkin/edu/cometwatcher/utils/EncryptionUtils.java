@@ -7,6 +7,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+import javax.annotation.PostConstruct;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -14,8 +15,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eshishkin.edu.cometwatcher.service.VaultRepository;
 
 @ApplicationScoped
 public class EncryptionUtils {
@@ -24,8 +26,17 @@ public class EncryptionUtils {
     private static final String CIPHER_ALGORITHM = "AES";
     private static final int KEY_LENGTH = 16;
 
-    @ConfigProperty(name = "application.encryption_key")
-    String encryptionKey;
+    private String encryptionKey;
+
+    @Inject
+    VaultRepository vault;
+
+    @PostConstruct
+    void init() {
+        encryptionKey = vault.readSingleConfigValue("application.encryption_key").orElseThrow(
+            () -> new IllegalStateException("Encryption key is not found in Vault")
+        );
+    }
 
     public String encryptAndEncode(String value) {
         return Base64.getUrlEncoder().encodeToString(encrypt(value));

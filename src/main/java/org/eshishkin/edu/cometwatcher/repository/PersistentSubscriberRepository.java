@@ -6,16 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.bson.codecs.pojo.annotations.BsonId;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eshishkin.edu.cometwatcher.exception.ResourceAlreadyExistsException;
 import org.eshishkin.edu.cometwatcher.exception.ResourceNotFoundException;
 import org.eshishkin.edu.cometwatcher.model.Language;
 import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
+import org.eshishkin.edu.cometwatcher.service.VaultRepository;
 
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
@@ -34,11 +35,20 @@ public class PersistentSubscriberRepository implements SubscriberRepository {
     private static final String SUBSCRIBER_COLLECTION = "subscriber";
     private static final String ID = "_id";
 
+    private String database;
+
     @Inject
     MongoClient client;
 
-    @ConfigProperty(name = "datasource.database")
-    String database;
+    @Inject
+    VaultRepository vault;
+
+    @PostConstruct
+    void init() {
+        database = vault.readSingleConfigValue("datasource.database").orElseThrow(
+                () -> new IllegalStateException("Database name is not found in Vault")
+        );
+    }
 
     @Override
     public List<Subscription> findAll() {

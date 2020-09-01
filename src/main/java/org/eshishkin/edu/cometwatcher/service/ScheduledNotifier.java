@@ -14,8 +14,6 @@ import org.eshishkin.edu.cometwatcher.model.GeoRequest;
 import org.eshishkin.edu.cometwatcher.model.ScheduleInterval;
 import org.eshishkin.edu.cometwatcher.model.Subscription;
 
-import io.quarkus.mailer.Mail;
-import io.quarkus.mailer.Mailer;
 import io.quarkus.scheduler.Scheduled;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +33,7 @@ public class ScheduledNotifier {
     CometReportRenderer renderer;
 
     @Inject
-    Mailer sender;
+    MailService sender;
 
     public void send(String email) {
         subscriberService.findByEmail(email).ifPresent(
@@ -67,7 +65,7 @@ public class ScheduledNotifier {
 
     private void send(String payload, List<Subscription> subscriptions) {
         subscriptions.stream().map(Subscription::getEmail).forEach(email -> {
-            sender.send(Mail.withHtml(email, renderer.getSubject(), payload));
+            sender.send(email, renderer.getSubject(), payload);
             subscriberService.updateLastTryDate(email);
         });
     }

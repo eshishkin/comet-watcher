@@ -8,7 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.http.auth.BasicUserPrincipal;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eshishkin.edu.cometwatcher.service.VaultRepository;
 
 import io.quarkus.security.ForbiddenException;
 import io.quarkus.security.UnauthorizedException;
@@ -17,9 +17,9 @@ import io.quarkus.security.identity.IdentityProvider;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.identity.request.UsernamePasswordAuthenticationRequest;
 import io.quarkus.security.runtime.QuarkusSecurityIdentity;
-import io.quarkus.vault.VaultKVSecretEngine;
 import io.quarkus.vault.runtime.client.VaultClientException;
 import io.smallrye.mutiny.Uni;
+
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
@@ -30,10 +30,7 @@ public class VaultSecurityProvider implements IdentityProvider<UsernamePasswordA
     private static final String PASSWORD_NAME = "name";
 
     @Inject
-    VaultKVSecretEngine secretEngine;
-
-    @ConfigProperty(name = "application.vault.user-storage-path")
-    String userStoragePath;
+    VaultRepository vault;
 
     @Override
     public Class<UsernamePasswordAuthenticationRequest> getRequestType() {
@@ -62,7 +59,7 @@ public class VaultSecurityProvider implements IdentityProvider<UsernamePasswordA
 
     private Map<String, String> getUserAttributes(String username) {
         try {
-            return secretEngine.readSecret(userStoragePath + "/" + username);
+            return vault.readUserData(username);
         } catch (VaultClientException ex) {
             throw new UnauthorizedException("User is not found", ex);
         }

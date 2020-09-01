@@ -7,12 +7,14 @@ import java.util.concurrent.TimeUnit;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eshishkin.edu.cometwatcher.external.HeavensAboveExternalService;
+import org.eshishkin.edu.cometwatcher.service.VaultRepository;
 import org.eshishkin.edu.cometwatcher.utils.LoggingInterceptor;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +43,14 @@ public class ClientConfiguration {
                 .build(HeavensAboveExternalService.class);
     }
 
+    @Inject
     @Produces
     @ApplicationScoped
-    public MongoClient mongoClient(@ConfigProperty(name = "datasource.mongo_url") String url) {
+    public MongoClient mongoClient(VaultRepository vault) {
+        String url = vault.readSingleConfigValue("datasource.mongo_url").orElseThrow(
+                () -> new IllegalStateException("Datasource url is not found in Vault")
+        );
+
         CodecRegistry registry = fromRegistries(
                 MongoClientSettings.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build())
