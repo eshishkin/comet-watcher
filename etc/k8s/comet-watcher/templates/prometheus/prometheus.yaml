@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+spec:
+  type: NodePort
+  ports:
+    - port: 9090
+      targetPort: 9090
+  selector:
+    app: prometheus-service
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-service
+  labels:
+    app: prometheus-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-service
+  template:
+    metadata:
+      labels:
+        app: prometheus-service
+    spec:
+      serviceAccountName: prometheus-service-account
+      volumes:
+        - name: prometheus-config-storage
+          configMap:
+            name: prometheus-config
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.20.1
+          volumeMounts:
+            - name: prometheus-config-storage
+              mountPath: /etc/prometheus
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9090

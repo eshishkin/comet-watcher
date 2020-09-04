@@ -25,6 +25,10 @@ spec:
       app: comet-watcher-service
   template:
     metadata:
+      annotations:
+        prometheus/scrape_enabled: "true"
+        prometheus/scrape_endpoint: "/metrics"
+        prometheus/scrape_port: "8080"
       labels:
         app: comet-watcher-service
     spec:

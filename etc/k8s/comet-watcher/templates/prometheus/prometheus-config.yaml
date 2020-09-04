@@ -1,0 +1,46 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval:     15s
+      evaluation_interval: 15s
+
+    rule_files:
+
+    scrape_configs:
+      - job_name: data-collector
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_scrape_enabled]
+            action: keep
+            regex: true
+
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: replace
+            target_label: application
+
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_scrape_endpoint]
+            action: replace
+            target_label: __metrics_path__
+
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_scrape_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
